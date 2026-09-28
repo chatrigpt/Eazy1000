@@ -1,0 +1,7 @@
+import {NextResponse} from "next/server";import {openRouterJSON} from "../../../../lib/eazy-ai";
+export const runtime="nodejs";export const maxDuration=60;
+const prompt=`Analyse cette vidéo culinaire avec précision. Décris ingrédients visibles/mentionnés, quantités seulement si observables, actions dans l'ordre, cuissons, ustensiles et timestamps approximatifs. Signale explicitement les incertitudes. N'invente rien.`;
+export async function POST(req:Request){try{const {videoUrl}=await req.json();if(!videoUrl)return NextResponse.json({error:"video_url_required"},{status:400});let analysis="";
+ if(process.env.FAL_KEY){const r=await fetch("https://queue.fal.run/fal-ai/video-understanding",{method:"POST",headers:{"Authorization":"Key "+process.env.FAL_KEY,"Content-Type":"application/json"},body:JSON.stringify({video_url:videoUrl,prompt,detailed_analysis:true})});if(!r.ok)throw new Error("fal submit failed: "+await r.text());const q=await r.json();return NextResponse.json({status:"queued",provider:"fal",requestId:q.request_id});}
+ const fallback=await openRouterJSON(`Tu transformes une analyse vidéo culinaire en Recipe JSON. Réponds JSON avec recipe, ingredients, steps, uncertainties.`,{videoUrl,note:"FAL_KEY absente: configure FAL pour l'analyse vidéo complète."});
+ return NextResponse.json(fallback||{mode:"demo",status:"needs_api_key",message:"Ajoute FAL_KEY pour activer l'analyse vidéo."});}catch(e:any){return NextResponse.json({error:"video_failed",message:e.message},{status:502})}}
