@@ -30,7 +30,7 @@ export default function Page(){
  {tab==="plan"&&<PlanView plan={plan} regenerate={()=>setPlanner(true)}/>}
  {tab==="pantry"&&<PantryView items={pantry} rescan={()=>scanRef.current?.click()}/>}
  {tab==="video"&&<VideoView data={video}/>}
- {tab==="cart"&&<CartView cart={cart} setCart={(x)=>{setCart(x);localStorage.setItem("eazy1000-cart",JSON.stringify(x))}}/>}
+ {tab==="cart"&&<CartView cart={cart} setCart={(x:Cart[])=>{setCart(x);localStorage.setItem("eazy1000-cart",JSON.stringify(x))}}/>}
  </section>
  <nav>{[["home",Home,"Aujourd’hui"],["plan",Sparkles,"Mes repas"],["cart",ShoppingBasket,"Courses"],["pantry",PackageOpen,"Garde-manger"]].map(([id,I,l]:any)=><button key={id} className={tab===id?"active":""} onClick={()=>setTab(id)}><I/><span>{l}</span></button>)}</nav>
  {planner&&<Planner budget={budget} setBudget={setBudget} people={people} setPeople={setPeople} days={days} setDays={setDays} goal={goal} setGoal={setGoal} close={()=>setPlanner(false)} run={generate}/>}
