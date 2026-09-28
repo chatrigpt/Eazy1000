@@ -1,0 +1,7 @@
+import {NextResponse} from "next/server";import {openRouterJSON} from "../../../../../lib/eazy-ai";
+export const runtime="nodejs";
+export async function GET(req:Request){try{const id=new URL(req.url).searchParams.get("id");if(!id||!process.env.FAL_KEY)return NextResponse.json({error:"missing_request_or_key"},{status:400});const h={"Authorization":"Key "+process.env.FAL_KEY};
+ const s=await fetch("https://queue.fal.run/fal-ai/video-understanding/requests/"+id+"/status",{headers:h});if(!s.ok)throw new Error("fal status failed");const status=await s.json();if(status.status!=="COMPLETED")return NextResponse.json({status:status.status});
+ const r=await fetch("https://queue.fal.run/fal-ai/video-understanding/requests/"+id,{headers:h});if(!r.ok)throw new Error("fal result failed");const raw=await r.json();const output=raw.output||raw.data?.output||JSON.stringify(raw);
+ const normalized=await openRouterJSON(`Normalise cette analyse en JSON Eazy: {"recipe":{"title":"","servings":null,"estimated_time_min":null},"ingredients":[{"name":"","quantity":null,"unit":"","confidence":0}],"steps":[{"order":1,"instruction":"","estimated_duration_min":null,"video_timestamp_start":null,"video_timestamp_end":null}],"uncertainties":[]}. N'invente pas les quantités/timestamps absents.`,output);
+ return NextResponse.json(normalized||{status:"completed",raw:output});}catch(e:any){return NextResponse.json({error:"status_failed",message:e.message},{status:502})}}
