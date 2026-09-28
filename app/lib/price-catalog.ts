@@ -1,0 +1,32 @@
+export type PriceRef={key:string;aliases:string[];product:string;packageQty:number;packageUnit:"g"|"kg"|"ml"|"cl"|"L"|"unit";price:number;source:string;observedAt:string;kind:"retail"|"market";city:"Abidjan";url?:string};
+export const ABIDJAN_PRICE_CATALOG:PriceRef[]=[
+{key:"huile",aliases:["huile","huile végétale"],product:"Dinor Huile végétale 90 cl",packageQty:90,packageUnit:"cl",price:1200,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"huile",aliases:["huile","huile végétale"],product:"Dinor Huile végétale 3 L",packageQty:3,packageUnit:"L",price:3775,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"huile",aliases:["huile","huile végétale"],product:"Dinor Huile végétale 5 L",packageQty:5,packageUnit:"L",price:6100,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"riz",aliases:["riz","riz parfumé"],product:"La Rizière Vietnam parfumé 900 g",packageQty:900,packageUnit:"g",price:600,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"riz",aliases:["riz","riz parfumé"],product:"Rizière Vietnamien parfumé 5 kg",packageQty:5,packageUnit:"kg",price:3039,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"riz",aliases:["riz","riz local"],product:"Klass Premium riz local 4,5 kg",packageQty:4.5,packageUnit:"kg",price:3000,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"riz",aliases:["riz","riz local"],product:"Riz local blanchi",packageQty:1,packageUnit:"kg",price:700,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
+{key:"spaghetti",aliases:["spaghetti","pâtes","pates"],product:"Panzani Spaghetti 500 g",packageQty:500,packageUnit:"g",price:1225,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"pates",aliases:["coquillettes","pâtes","pates"],product:"Panzani Coquillettes 500 g",packageQty:500,packageUnit:"g",price:1485,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"farine",aliases:["farine","farine de blé"],product:"GMA Farine pâtissière T45 1 kg",packageQty:1,packageUnit:"kg",price:840,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"sucre",aliases:["sucre","sucre blanc"],product:"Princesse Tatie sucre blanc 1 kg",packageQty:1,packageUnit:"kg",price:875,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"lait",aliases:["lait en poudre","lait"],product:"Laity lait instantané 400 g",packageQty:400,packageUnit:"g",price:2200,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"lait",aliases:["lait en poudre","lait"],product:"Nido lait en poudre 400 g",packageQty:400,packageUnit:"g",price:3200,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"tomate_concentree",aliases:["tomate concentrée","concentré de tomate","tomates concentrées"],product:"Alyssa double concentré tomate 370 g",packageQty:370,packageUnit:"g",price:400,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"petits_pois",aliases:["petits pois"],product:"Alyssa petits pois 400 g",packageQty:400,packageUnit:"g",price:325,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"bouillon",aliases:["cube","bouillon cube","maggi"],product:"Maggi 60 tablettes 600 g",packageQty:600,packageUnit:"g",price:1765,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
+{key:"tomate",aliases:["tomate","tomates"],product:"Tomate SODEFEL",packageQty:1,packageUnit:"kg",price:1030,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
+{key:"aubergine",aliases:["aubergine","aubergines","n'drowa"],product:"Aubergine N'drowa",packageQty:1,packageUnit:"kg",price:430,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
+{key:"piment",aliases:["piment","piment frais"],product:"Piment frais ordinaire",packageQty:1,packageUnit:"kg",price:690,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
+{key:"plantain",aliases:["banane plantain","plantain"],product:"Banane plantain",packageQty:1,packageUnit:"kg",price:610,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
+{key:"igname",aliases:["igname","igname kponan"],product:"Igname Kponan",packageQty:1,packageUnit:"kg",price:800,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
+{key:"manioc",aliases:["manioc","manioc doux"],product:"Manioc doux",packageQty:1,packageUnit:"kg",price:470,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
+{key:"mais",aliases:["maïs","mais","maïs grain"],product:"Maïs grain",packageQty:1,packageUnit:"kg",price:470,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
+{key:"oignon",aliases:["oignon","oignons","oignon violet","oignon blanc"],product:"Oignon",packageQty:1,packageUnit:"kg",price:600,source:"OCPV/PAMD Agro Abidjan",observedAt:"2026-W09",kind:"market",city:"Abidjan"},
+{key:"carotte",aliases:["carotte","carottes"],product:"Carotte",packageQty:1,packageUnit:"kg",price:800,source:"OCPV/PAMD Agro Abidjan",observedAt:"2026-W09",kind:"market",city:"Abidjan"},
+{key:"chou",aliases:["chou","chou vert"],product:"Chou vert",packageQty:1,packageUnit:"kg",price:350,source:"OCPV/PAMD Agro Abidjan",observedAt:"2026-W09",kind:"market",city:"Abidjan"},
+{key:"pomme_de_terre",aliases:["pomme de terre","pommes de terre"],product:"Pomme de terre",packageQty:1,packageUnit:"kg",price:650,source:"OCPV/PAMD Agro Abidjan",observedAt:"2026-W09",kind:"market",city:"Abidjan"},
+{key:"gombo",aliases:["gombo","gombo baoulé"],product:"Gombo Baoulé",packageQty:1,packageUnit:"kg",price:740,source:"OCPV/PAMD Agro Abidjan",observedAt:"2026-W09",kind:"market",city:"Abidjan"}
+];
+export const PRICE_CATALOG_TEXT=ABIDJAN_PRICE_CATALOG.map(x=>`${x.product} | ${x.packageQty} ${x.packageUnit} | ${x.price} FCFA | ${x.source} | ${x.observedAt}`).join("\n");
