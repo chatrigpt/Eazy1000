@@ -22,7 +22,7 @@ export async function POST(req:Request){
   if(!taskId){console.error("[meal-image] missing task id",JSON.stringify(job).slice(0,1000));return NextResponse.json({error:"missing_task_id",model:MODEL},{status:502})}
   for(let i=0;i<45;i++){
    await sleep(900);
-   const poll=await fetch(BASE+"/api/generate/status?task_id="+encodeURIComponent(taskId),{headers:{"Authorization":"Bearer "+key},cache:"no-store"});
+   const poll=await fetch(BASE+"/api/generate/status/"+encodeURIComponent(taskId),{headers:{"Authorization":"Bearer "+key},cache:"no-store"});
    const pollRaw=await poll.text();let state:any={};try{state=JSON.parse(pollRaw)}catch{state={message:pollRaw.slice(0,500)}}
    if(!poll.ok){console.error("[meal-image] poll http error",{taskId,status:poll.status,message:errText(state)});return NextResponse.json({error:"image_provider_poll",provider_status:poll.status,message:errText(state),task_id:taskId},{status:502})}
    const data=state?.data||state;const status=String(data?.status||data?.state||"").toLowerCase();
