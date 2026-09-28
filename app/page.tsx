@@ -5,7 +5,8 @@ import {EazyAPI} from "../lib/api-client";
 import {Home,Sparkles,ShoppingBasket,UserRound,Camera,WalletCards,Target,Video,Search,ArrowRight,X,Check,Clock3,ChevronLeft,RefreshCw,ChefHat,Play,Plus,PackageOpen,CalendarDays} from "lucide-react";
 
 type Pantry={name:string;quantity:number|null;unit:string;confidence:number};
-type PlanIngredient={name:string;quantity?:number|string|null;unit?:string;estimated_price?:number;pantry_match?:boolean};\ntype Meal={title:string;day:number;date?:string;meal:string;estimated_cost:number;match:number;reason?:string;ingredients?:PlanIngredient[]};
+type PlanIngredient={name:string;quantity?:number|string|null;unit?:string;estimated_price?:number;pantry_match?:boolean};
+type Meal={title:string;day:number;date?:string;meal:string;estimated_cost:number;match:number;reason?:string;ingredients?:PlanIngredient[]};
 type PlanResult={mode?:string;summary:any;meals:Meal[];shopping:any[];notice?:string};
 type Cart=Ingredient&{id:string;recipe:string;done:boolean};
 const money=(n:number)=>new Intl.NumberFormat("fr-FR").format(n||0)+" F";
