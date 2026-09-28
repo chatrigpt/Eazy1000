@@ -1,6 +1,6 @@
 "use client";
 import {useEffect,useMemo,useRef,useState} from "react";
-import {recipes,Recipe,Ingredient} from "./data";
+import {recipes,Recipe,Ingredient} from "./data";\nimport {EazyAPI} from "../lib/api-client";
 import {Home,Search,ShoppingBasket,UserRound,Clock3,MapPin,Truck,Plus,Check,Download,Upload,ChevronLeft,X,ScanLine,Play,ChefHat,Camera,WalletCards,Target,Video,ArrowRight,Sparkles,Flame,Leaf,UtensilsCrossed,SlidersHorizontal,PackageOpen} from "lucide-react";
 
 type CartItem=Ingredient&{id:string;recipe:string;done:boolean};
@@ -10,7 +10,7 @@ const money=(n:number)=>new Intl.NumberFormat("fr-FR").format(n)+" F";
 const Glyph=({type}:{type:"scan"|"budget"|"goal"|"video"})=>{const I={scan:Camera,budget:WalletCards,goal:Target,video:Video}[type];return <span className={"glyph "+type}><I/></span>};
 
 export default function Page(){
- const [tab,setTab]=useState("home"),[user,setUser]=useState<UserData>(initial),[selected,setSelected]=useState<Recipe|null>(null),[delivery,setDelivery]=useState(false),[query,setQuery]=useState(""),[toast,setToast]=useState(""),[plan,setPlan]=useState(false),fileRef=useRef<HTMLInputElement>(null);
+ const [tab,setTab]=useState("home"),[user,setUser]=useState<UserData>(initial),[selected,setSelected]=useState<Recipe|null>(null),[delivery,setDelivery]=useState(false),[query,setQuery]=useState(""),[toast,setToast]=useState(""),[plan,setPlan]=useState(false),[busy,setBusy]=useState(false),scanRef=useRef<HTMLInputElement>(null),videoRef=useRef<HTMLInputElement>(null),fileRef=useRef<HTMLInputElement>(null);
  useEffect(()=>{try{const x=localStorage.getItem("eazy1000-user");if(x)setUser(JSON.parse(x))}catch{}},[]);
  useEffect(()=>{localStorage.setItem("eazy1000-user",JSON.stringify(user))},[user]);
  const filtered=useMemo(()=>recipes.filter(r=>(r.name+r.origin+r.tag).toLowerCase().includes(query.toLowerCase())),[query]);
@@ -18,7 +18,7 @@ export default function Page(){
  const add=(ing:Ingredient,r:Recipe)=>{setUser(u=>({...u,xp:u.xp+5,cart:u.cart.some(c=>c.id===r.id+"-"+ing.name)?u.cart:[...u.cart,{...ing,id:r.id+"-"+ing.name,recipe:r.name,done:false}]}));flash("Ajouté à tes courses")};
  const addAll=(r:Recipe)=>{setUser(u=>({...u,xp:u.xp+20,cart:[...u.cart,...r.ingredients.filter(i=>!u.cart.some(c=>c.id===r.id+"-"+i.name)).map(i=>({...i,id:r.id+"-"+i.name,recipe:r.name,done:false}))]}));flash("Les ingrédients manquants sont prêts")};
  const exportData=()=>{const b=new Blob([JSON.stringify(user,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="eazy1000-"+Date.now()+".json";a.click();URL.revokeObjectURL(a.href)};
- const importData=(f?:File)=>{if(!f)return;const rd=new FileReader();rd.onload=()=>{try{setUser(JSON.parse(String(rd.result)));flash("Sauvegarde restaurée")}catch{flash("Fichier invalide")}};rd.readAsText(f)};
+ const scanFiles=async(fs:FileList|null)=>{if(!fs?.length)return;setBusy(true);try{const images=await Promise.all(Array.from(fs).slice(0,6).map(f=>new Promise<string>((ok,ko)=>{const r=new FileReader();r.onload=()=>ok(String(r.result));r.onerror=()=>ko(r.error);r.readAsDataURL(f)})));const out:any=await EazyAPI.scanPantry(images);localStorage.setItem("eazy1000-pantry",JSON.stringify(out.items||[]));flash((out.items?.length||0)+" aliments détectés");}catch(e:any){flash(e.message)}finally{setBusy(false)}};\n const importData=(f?:File)=>{if(!f)return;const rd=new FileReader();rd.onload=()=>{try{setUser(JSON.parse(String(rd.result)));flash("Sauvegarde restaurée")}catch{flash("Fichier invalide")}};rd.readAsText(f)};
  return <main>
   {toast&&<div className="toast">{toast}</div>}
   <header><div className="brand">Eazy <b>1000</b></div><button className="avatar" onClick={()=>setTab("profile")}>{user.name[0]}</button></header>
@@ -26,10 +26,10 @@ export default function Page(){
    {tab==="home"&&<><div className="hello"><p>Bonsoir {user.name},</p><h1>On mange bien<br/>ce soir.</h1></div>
     <div className="search"><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Une envie ? Un ingrédient ? Une vidéo ?"/></div>
     <div className="contextGrid">
-      <button onClick={()=>flash("Ajoute une ou plusieurs photos")}><Glyph type="scan"/><b>Scanner<br/>mes aliments</b></button>
+      <button onClick={()=>scanRef.current?.click()}><Glyph type="scan"/><b>{busy?"Analyse…":"Scanner"}<br/>mes aliments</b></button><input ref={scanRef} hidden multiple type="file" accept="image/*" onChange={e=>scanFiles(e.target.files)}/>
       <button onClick={()=>setPlan(true)}><Glyph type="budget"/><b>Mon<br/>budget</b></button>
       <button onClick={()=>setPlan(true)}><Glyph type="goal"/><b>Mon<br/>objectif</b></button>
-      <button onClick={()=>flash("Import vidéo bientôt disponible")}><Glyph type="video"/><b>Une<br/>vidéo</b></button>
+      <button onClick={()=>{const u=prompt("URL publique de la vidéo à analyser");if(!u)return;setBusy(true);EazyAPI.videoRecipe(u).then((x:any)=>{localStorage.setItem("eazy1000-video-job",JSON.stringify(x));flash(x.status==="queued"?"Analyse vidéo lancée":"Pipeline vidéo prêt")}).catch((e:any)=>flash(e.message)).finally(()=>setBusy(false))}}><Glyph type="video"/><b>Une<br/>vidéo</b></button>
     </div>
     <div className="sectionTitle"><div><small>PRÊT À DÉMARRER</small><h2>Tu peux presque les cuisiner</h2></div><button onClick={()=>setTab("discover")}>Tout voir</button></div>
     <div className="cards">{filtered.slice(0,4).map(r=><RecipeCard key={r.id} r={r} open={()=>setSelected(r)}/>)}</div>
@@ -40,7 +40,7 @@ export default function Page(){
    {tab==="profile"&&<Profile user={user} exportData={exportData} fileRef={fileRef} importData={importData}/>}
   </section>
   <nav>{[["home",Home,"Aujourd’hui"],["discover",Sparkles,"Mes repas"],["cart",ShoppingBasket,"Cuisine"],["profile",UserRound,"Moi"]].map(([id,I,label]:any)=><button key={id} className={tab===id?"active":""} onClick={()=>setTab(id)}><I/><span>{label}</span>{id==="cart"&&user.cart.filter(x=>!x.done).length>0&&<i>{user.cart.filter(x=>!x.done).length}</i>}</button>)}</nav>
-  {plan&&<Plan close={()=>setPlan(false)} done={()=>{setPlan(false);setTab("discover");flash("Ton plan de 4 jours est prêt")}}/>}
+  {plan&&<Plan close={()=>setPlan(false)} done={async()=>{setBusy(true);try{const pantry=JSON.parse(localStorage.getItem("eazy1000-pantry")||"[]");const out:any=await EazyAPI.createMealPlan({budget:15000,people:2,days:4,goal:"Manger mieux",pantry});localStorage.setItem("eazy1000-plan",JSON.stringify(out));setPlan(false);setTab("discover");flash("Ton plan est prêt")}catch(e:any){flash(e.message)}finally{setBusy(false)}}}/>}
   {selected&&<RecipeSheet r={selected} close={()=>setSelected(null)} add={add} addAll={addAll} deliver={()=>setDelivery(true)}/>}
   {delivery&&selected&&<Delivery r={selected} user={user} setUser={setUser} close={()=>setDelivery(false)} flash={flash}/>}
  </main>
