@@ -5,7 +5,7 @@ import {EazyAPI} from "../lib/api-client";
 import {Home,Sparkles,ShoppingBasket,UserRound,Camera,WalletCards,Target,Video,Search,ArrowRight,X,Check,Clock3,ChevronLeft,RefreshCw,ChefHat,Play,Plus,PackageOpen,CalendarDays,Lock,Unlock,Flame,Utensils,CookingPot,Pause,Scissors,RotateCw,Droplets} from "lucide-react";
 
 type Pantry={name:string;quantity:number|null;unit:string;confidence:number};
-type PlanIngredient={name:string;quantity?:number|string|null;unit?:string;estimated_price?:number;pantry_match?:boolean};
+type PlanIngredient={name:string;quantity?:number|string|null;unit?:string;estimated_price?:number;checkout_price?:number|null;product_name?:string;package_quantity?:number|string;package_unit?:string;units_to_buy?:number;quantity_used?:number|string;leftover_quantity?:number|string;leftover_unit?:string;price_source?:string;price_observed_at?:string;pantry_match?:boolean};
 type Meal={title:string;day:number;date?:string;meal:string;estimated_cost:number;match:number;reason?:string;ingredients?:PlanIngredient[];steps?:any[];image?:string;imageLoading?:boolean};
 type PlanResult={mode?:string;summary:any;meals:Meal[];shopping:any[];notice?:string};
 type Cart=Ingredient&{id:string;recipe:string;done:boolean;listId?:string;createdAt?:string;listTitle?:string};
