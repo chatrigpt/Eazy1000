@@ -29,7 +29,14 @@ export async function POST(req:Request){
   if(!segments.length)return NextResponse.json({error:"transcript_empty",message:"Supadata n'a retourné aucun contenu exploitable pour cette vidéo."},{status:422});
 
   const normalized=await openRouterJSON(
-   `Tu es le moteur d'extraction culinaire d'Eazy 1000. À partir d'une transcription horodatée d'une vidéo sociale, produis strictement un JSON: {"recipe":{"title":"","servings":null,"estimated_time_min":null,"source_url":""},"ingredients":[{"name":"","quantity":null,"unit":"","confidence":0}],"steps":[{"order":1,"instruction":"","estimated_duration_min":null,"video_timestamp_start":null,"video_timestamp_end":null}],"uncertainties":[]}. Utilise offset et duration (millisecondes) pour les timestamps en secondes. N'invente jamais une quantité non dite. Si une information dépend uniquement de l'image et n'est pas dans la transcription, ajoute-la aux uncertainties. Réponds en français.`,
+   `Tu es le moteur culinaire Eazy 1000. Transforme cette transcription horodatée en recette exécutable. RÈGLE PORTIONS: si la source mentionne explicitement un nombre de personnes/portions, utilise-le; sinon servings=2 et adapte les quantités explicites quand c'est raisonnablement calculable. N'invente jamais un ingrédient, une quantité, un outil ou une température absents: utilise null et ajoute l'incertitude.
+
+Retourne STRICTEMENT ce JSON:
+{"recipe":{"title":"","servings":2,"servings_source":"default|source","estimated_time_min":null,"source_url":""},
+"ingredients":[{"name":"","recipe_quantity":null,"recipe_unit":"","confidence":0,"commercial_quantity":null,"commercial_unit":null,"units_to_buy":null,"estimated_price":null}],
+"steps":[{"order":1,"instruction":"","ingredient_actions":[{"ingredient":"","quantity":null,"unit":"","action":""}],"movement":null,"tool":null,"heat":{"enabled":false,"intensity":null,"temperature_c":null},"timer_seconds":null,"auto_advance":true,"video_timestamp_start":null,"video_timestamp_end":null}],
+"uncertainties":[]}.
+Les commercial_* sont une préparation pour le moteur courses: ne fabrique ni conditionnement ni prix si le transcript ne les donne pas. Les timestamps sont en secondes à partir de offset/duration en millisecondes. Décris movement comme un geste de cuisine court et concret uniquement s'il est déductible (remuer, fouetter, retourner, pétrir, émincer...). Réponds en français.`,
    {source_url:videoUrl,language:transcript.lang||null,segments}
   );
   if(!normalized)return NextResponse.json({error:"normalization_failed",message:"OpenRouter n'a pas produit de recette structurée."},{status:502});
