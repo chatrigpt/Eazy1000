@@ -9,7 +9,7 @@ type PlanIngredient={name:string;quantity?:number|string|null;unit?:string;estim
 type Meal={title:string;day:number;date?:string;meal:string;estimated_cost:number;match:number;reason?:string;ingredients?:PlanIngredient[];steps?:any[];image?:string;imageLoading?:boolean};
 type PlanResult={mode?:string;summary:any;meals:Meal[];shopping:any[];notice?:string};
 type Cart=Ingredient&{id:string;recipe:string;done:boolean;listId?:string;createdAt?:string;listTitle?:string};
-const money=(n:number)=>new Intl.NumberFormat("fr-FR").format(n||0)+" F";
+const money=(n:number|null|undefined)=>n==null?"À vérifier":new Intl.NumberFormat("fr-FR").format(n)+" F";
 
 export default function Page(){
  const [tab,setTab]=useState("home"),[budget,setBudget]=useState(15000),[people,setPeople]=useState(2),[days,setDays]=useState(4),[goal,setGoal]=useState("Manger mieux"),[planner,setPlanner]=useState(false),[busy,setBusy]=useState(""),[toast,setToast]=useState(""),[pantry,setPantry]=useState<Pantry[]>([]),[plan,setPlan]=useState<PlanResult|null>(null),[video,setVideo]=useState<any>(null),[selected,setSelected]=useState<Recipe|null>(null),[cart,setCart]=useState<Cart[]>([]),[planMeal,setPlanMeal]=useState<Meal|null>(null),[delivery,setDelivery]=useState<any>(null),[mealSlots,setMealSlots]=useState<string[]>(["Déjeuner","Dîner"]),[videoInput,setVideoInput]=useState(""),[cookVideo,setCookVideo]=useState<any>(null),[cookMeal,setCookMeal]=useState<any>(null),[cuisines,setCuisines]=useState<string[]>(["Africaine","Occidentale","Asiatique","Arabe"]);
