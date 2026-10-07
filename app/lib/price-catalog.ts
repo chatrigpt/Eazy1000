@@ -1,127 +1,112 @@
-export type PriceRef={key:string;aliases:string[];product:string;packageQty:number;packageUnit:"g"|"kg"|"ml"|"cl"|"L"|"unit";price:number;source:string;observedAt:string;kind:"retail"|"market";city:"Abidjan";url?:string};
-export const ABIDJAN_PRICE_CATALOG:PriceRef[]=[
-{key:"huile",aliases:["huile","huile végétale"],product:"Dinor Huile végétale 90 cl",packageQty:90,packageUnit:"cl",price:1200,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"huile",aliases:["huile","huile végétale"],product:"Dinor Huile végétale 3 L",packageQty:3,packageUnit:"L",price:3775,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"huile",aliases:["huile","huile végétale"],product:"Dinor Huile végétale 5 L",packageQty:5,packageUnit:"L",price:6100,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"riz",aliases:["riz","riz parfumé"],product:"La Rizière Vietnam parfumé 900 g",packageQty:900,packageUnit:"g",price:600,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"riz",aliases:["riz","riz parfumé"],product:"Rizière Vietnamien parfumé 5 kg",packageQty:5,packageUnit:"kg",price:3039,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"riz",aliases:["riz","riz local"],product:"Klass Premium riz local 4,5 kg",packageQty:4.5,packageUnit:"kg",price:3000,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"riz",aliases:["riz","riz local"],product:"Riz local blanchi",packageQty:1,packageUnit:"kg",price:700,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
-{key:"spaghetti",aliases:["spaghetti","pâtes","pates"],product:"Panzani Spaghetti 500 g",packageQty:500,packageUnit:"g",price:1225,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"pates",aliases:["coquillettes","pâtes","pates"],product:"Panzani Coquillettes 500 g",packageQty:500,packageUnit:"g",price:1485,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"farine",aliases:["farine","farine de blé"],product:"GMA Farine pâtissière T45 1 kg",packageQty:1,packageUnit:"kg",price:840,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"sucre",aliases:["sucre","sucre blanc"],product:"Princesse Tatie sucre blanc 1 kg",packageQty:1,packageUnit:"kg",price:875,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"lait",aliases:["lait en poudre","lait"],product:"Laity lait instantané 400 g",packageQty:400,packageUnit:"g",price:2200,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"lait",aliases:["lait en poudre","lait"],product:"Nido lait en poudre 400 g",packageQty:400,packageUnit:"g",price:3200,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"tomate_concentree",aliases:["tomate concentrée","concentré de tomate","tomates concentrées"],product:"Alyssa double concentré tomate 370 g",packageQty:370,packageUnit:"g",price:400,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"petits_pois",aliases:["petits pois"],product:"Alyssa petits pois 400 g",packageQty:400,packageUnit:"g",price:325,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"bouillon",aliases:["cube","bouillon cube","maggi"],product:"Maggi 60 tablettes 600 g",packageQty:600,packageUnit:"g",price:1765,source:"Jumia CI",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"tomate",aliases:["tomate","tomates"],product:"Tomate SODEFEL",packageQty:1,packageUnit:"kg",price:1030,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
-{key:"aubergine",aliases:["aubergine","aubergines","n'drowa"],product:"Aubergine N'drowa",packageQty:1,packageUnit:"kg",price:430,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
-{key:"piment",aliases:["piment","piment frais"],product:"Piment frais ordinaire",packageQty:1,packageUnit:"kg",price:690,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
-{key:"plantain",aliases:["banane plantain","plantain"],product:"Banane plantain",packageQty:1,packageUnit:"kg",price:610,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
-{key:"igname",aliases:["igname","igname kponan"],product:"Igname Kponan",packageQty:1,packageUnit:"kg",price:800,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
-{key:"manioc",aliases:["manioc","manioc doux"],product:"Manioc doux",packageQty:1,packageUnit:"kg",price:470,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
-{key:"mais",aliases:["maïs","mais","maïs grain"],product:"Maïs grain",packageQty:1,packageUnit:"kg",price:470,source:"OCPV Abidjan",observedAt:"2026-09-20",kind:"market",city:"Abidjan"},
-{key:"oignon",aliases:["oignon","oignons","oignon violet","oignon blanc"],product:"Oignon",packageQty:1,packageUnit:"kg",price:600,source:"OCPV/PAMD Agro Abidjan",observedAt:"2026-W09",kind:"market",city:"Abidjan"},
-{key:"carotte",aliases:["carotte","carottes"],product:"Carotte",packageQty:1,packageUnit:"kg",price:800,source:"OCPV/PAMD Agro Abidjan",observedAt:"2026-W09",kind:"market",city:"Abidjan"},
-{key:"chou",aliases:["chou","chou vert"],product:"Chou vert",packageQty:1,packageUnit:"kg",price:350,source:"OCPV/PAMD Agro Abidjan",observedAt:"2026-W09",kind:"market",city:"Abidjan"},
-{key:"pomme_de_terre",aliases:["pomme de terre","pommes de terre"],product:"Pomme de terre",packageQty:1,packageUnit:"kg",price:650,source:"OCPV/PAMD Agro Abidjan",observedAt:"2026-W09",kind:"market",city:"Abidjan"},
-{key:"gombo",aliases:["gombo","gombo baoulé"],product:"Gombo Baoulé",packageQty:1,packageUnit:"kg",price:740,source:"OCPV/PAMD Agro Abidjan",observedAt:"2026-W09",kind:"market",city:"Abidjan"},
-{key:"attieke",aliases:["attiéké","attieke"],product:"Adjovan Attiéké 1 boule",packageQty:1,packageUnit:"unit",price:500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan",url:"https://www.adjovan.com/product-category/attieke-pates-riz/"},
-{key:"attieke",aliases:["attiéké","attieke"],product:"Adjovan Attiéké 2 kg",packageQty:2,packageUnit:"kg",price:1300,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"gombo",aliases:["gombo","gombo frais","gombo baoulé"],product:"Adjovan Gombo frais Baoulé 500 g",packageQty:500,packageUnit:"g",price:700,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan",url:"https://www.adjovan.com/shop/fruits-legumes/legumes-frais/gombo-frais-1-kg/"},
-{key:"tomate",aliases:["tomate","tomates","tomate africaine"],product:"Adjovan Tomate africaine 500 g",packageQty:500,packageUnit:"g",price:800,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"tomate",aliases:["tomate","tomates","tomate fraîche","tomate fraiche"],product:"Adjovan Tomate fraîche 1 kg",packageQty:1,packageUnit:"kg",price:2500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"piment",aliases:["piment","piment frais"],product:"Adjovan Piment frais 100 g",packageQty:100,packageUnit:"g",price:500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"citron",aliases:["citron","citron vert","lime"],product:"Adjovan Citron vert lime local 1 kg",packageQty:1,packageUnit:"kg",price:700,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"banane_douce",aliases:["banane douce","banane"],product:"Adjovan Banane douce 1 kg",packageQty:1,packageUnit:"kg",price:350,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"poulet",aliases:["poulet","poulet de chair","poulet frais"],product:"Adjovan Gros poulet de chair frais 1,5-1,8 kg",packageQty:1,packageUnit:"unit",price:4500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"boeuf",aliases:["boeuf","bœuf","viande de boeuf","viande de bœuf"],product:"Adjovan Bœuf sans os bourguignon 1 kg",packageQty:1,packageUnit:"kg",price:4500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"pain",aliases:["pain","baguette"],product:"Adjovan Pain nature baguette",packageQty:1,packageUnit:"unit",price:200,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"sardine",aliases:["sardine","sardines","sardine en conserve"],product:"Adjovan Sardines huile Marius 125 g",packageQty:125,packageUnit:"g",price:500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"tomate_concentree",aliases:["tomate concentrée","concentré de tomate","tomate pâte"],product:"Adjovan Concentré tomate Alyssa 400 g",packageQty:400,packageUnit:"g",price:500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"cube",aliases:["cube maggi","maggi","bouillon cube"],product:"Adjovan Cube Maggi bœuf x10",packageQty:10,packageUnit:"unit",price:400,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"cube",aliases:["cube maggi crevette","maggi crevette","bouillon crevette"],product:"Adjovan Cube Maggi crevette x10",packageQty:10,packageUnit:"unit",price:300,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"graine",aliases:["graine","graines de palme","graine de palme"],product:"Adjovan Graine de palme 1 kg",packageQty:1,packageUnit:"kg",price:500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"gombo_sec",aliases:["gombo sec","djoumblé","djoumble"],product:"Adjovan Gombo sec Djoumblé 500 g",packageQty:500,packageUnit:"g",price:800,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"yet",aliases:["yet"],product:"Adjovan Yet 50 g",packageQty:50,packageUnit:"g",price:200,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"soumbara",aliases:["soumbara","soumara"],product:"Adjovan Soumara en poudre boîte",packageQty:1,packageUnit:"unit",price:600,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"}
-,{key:"ail",aliases:["ail"],product:"Adjovan Ail 500 g",packageQty:500,packageUnit:"g",price:900,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"aubergine",aliases:["aubergine petit petit"],product:"Adjovan Aubergine Petit Petit 500 g",packageQty:500,packageUnit:"g",price:500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"aubergine",aliases:["aubergine blanche"],product:"Adjovan Aubergine blanche 500 g",packageQty:500,packageUnit:"g",price:400,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"aubergine",aliases:["aubergine violette","aubergine noire"],product:"Adjovan Aubergine violet noire 500 g",packageQty:500,packageUnit:"g",price:600,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"avocat",aliases:["avocat"],product:"Adjovan Avocat 1 kg",packageQty:1,packageUnit:"kg",price:800,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"avocat",aliases:["avocat"],product:"Adjovan Avocat unité",packageQty:1,packageUnit:"unit",price:350,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"basilic",aliases:["basilic"],product:"Adjovan Basilic botte",packageQty:1,packageUnit:"unit",price:600,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"bissap",aliases:["bissap","bissap blanc"],product:"Adjovan Bissap blanc séché 1 kg",packageQty:1,packageUnit:"kg",price:5000,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"chou",aliases:["chou","choux"],product:"Adjovan Choux 500 g",packageQty:500,packageUnit:"g",price:450,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"chou_rouge",aliases:["chou rouge"],product:"Adjovan Choux rouge 1 kg",packageQty:1,packageUnit:"kg",price:1700,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"concombre",aliases:["concombre"],product:"Adjovan Concombre 1 kg",packageQty:1,packageUnit:"kg",price:600,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"courge",aliases:["courge"],product:"Adjovan Courge 300 g",packageQty:300,packageUnit:"g",price:350,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"courgette",aliases:["courgette"],product:"Adjovan Courgette 500 g",packageQty:500,packageUnit:"g",price:300,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"persil",aliases:["persil"],product:"Adjovan Persil 1 botte",packageQty:1,packageUnit:"unit",price:500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"huile",aliases:["huile","huile végétale","huile dinor"],product:"Adjovan Huile Dinor 0.9 L",packageQty:0.9,packageUnit:"L",price:1200,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"huile",aliases:["huile","huile végétale","huile dinor"],product:"Adjovan Huile Dinor 1.5 L",packageQty:1.5,packageUnit:"L",price:1775,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"huile",aliases:["huile","huile végétale","huile dinor"],product:"Adjovan Huile Dinor 3 L",packageQty:3,packageUnit:"L",price:3775,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"huile",aliases:["huile","huile végétale","huile dinor"],product:"Adjovan Huile Dinor 5 L",packageQty:5,packageUnit:"L",price:6100,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"huile_palme",aliases:["huile de palme","huile rouge"],product:"Adjovan Huile de palme rouge 1 L",packageQty:1,packageUnit:"L",price:1700,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"riz",aliases:["riz","riz local"],product:"Adjovan Riz local Malowoussou 1 kg",packageQty:1,packageUnit:"kg",price:900,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"riz",aliases:["riz","riz basmati"],product:"Adjovan Riz basmati Rizière 4.5 kg",packageQty:4.5,packageUnit:"kg",price:5800,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"riz",aliases:["riz"],product:"Adjovan Riz Delicia vert 4.5 kg",packageQty:4.5,packageUnit:"kg",price:3900,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"poulet",aliases:["aile de poulet","ailes de poulet"],product:"Adjovan Ailes de poulet 1 kg",packageQty:1,packageUnit:"kg",price:3900,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"poulet",aliases:["cuisse de poulet","poulet"],product:"Adjovan Cuisse de poulet frais 1 kg",packageQty:1,packageUnit:"kg",price:3450,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"poulet",aliases:["blanc de poulet","escalope de poulet"],product:"Adjovan Escalope blanc poulet 1 kg",packageQty:1,packageUnit:"kg",price:5000,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"gesier",aliases:["gésier","gesier"],product:"Adjovan Gésiers 1 kg",packageQty:1,packageUnit:"kg",price:3000,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"boeuf",aliases:["boeuf","bœuf","viande de boeuf","viande de bœuf"],product:"Adjovan Bœuf avec os bourguignon 1 kg",packageQty:1,packageUnit:"kg",price:4000,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"boeuf_hache",aliases:["viande hachée","boeuf haché","bœuf haché"],product:"Adjovan Viande hachée bœuf 500 g",packageQty:500,packageUnit:"g",price:2800,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"porc",aliases:["porc","côte de porc"],product:"Adjovan Côtes de porc sans peau 500 g",packageQty:500,packageUnit:"g",price:1600,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"porc",aliases:["porc","échine de porc"],product:"Adjovan Échine de porc 1 kg",packageQty:1,packageUnit:"kg",price:1400,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"porc",aliases:["porc","poitrine de porc"],product:"Adjovan Poitrine de porc 500 g",packageQty:500,packageUnit:"g",price:1800,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"poisson",aliases:["capitaine","poisson capitaine"],product:"Adjovan Capitaine 1 kg",packageQty:1,packageUnit:"kg",price:3300,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"poisson",aliases:["carpe rouge","carpe"],product:"Adjovan Carpe rouge 1 kg",packageQty:1,packageUnit:"kg",price:4500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"poisson",aliases:["sole","poisson sole"],product:"Adjovan Sole 1 kg",packageQty:1,packageUnit:"kg",price:5000,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"poisson",aliases:["sosso","bar","poisson bar"],product:"Adjovan Sosso Bar frais 1 kg",packageQty:1,packageUnit:"kg",price:4000,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"thon",aliases:["thon","thon blanc"],product:"Adjovan Thon blanc 1 kg",packageQty:1,packageUnit:"kg",price:3000,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"thon",aliases:["thon","thon rouge"],product:"Adjovan Thon rouge 1 kg",packageQty:1,packageUnit:"kg",price:2500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"tilapia",aliases:["tilapia","tiliapia"],product:"Adjovan Tilapia 1 kg",packageQty:1,packageUnit:"kg",price:2000,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"cube",aliases:["cube maggi","maggi","bouillon cube"],product:"Adjovan Cube Maggi bœuf 60 x 10 g",packageQty:600,packageUnit:"g",price:1900,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"cube",aliases:["cube maggi poulet","maggi poulet"],product:"Adjovan Cube Maggi poulet 60 x 10 g",packageQty:600,packageUnit:"g",price:1800,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"}
-,{key:"ananas",aliases:["ananas"],product:"Adjovan Ananas unité",packageQty:1,packageUnit:"unit",price:350,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"aneth",aliases:["aneth"],product:"Adjovan Aneth botte",packageQty:1,packageUnit:"unit",price:300,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"carotte",aliases:["carotte","carottes"],product:"Adjovan Carotte sachet 12-15",packageQty:1,packageUnit:"unit",price:1900,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"champignon",aliases:["champignon local","pleurote","champignon"],product:"Adjovan Champignon local pleurote 100 g",packageQty:100,packageUnit:"g",price:500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"citronnelle",aliases:["citronnelle"],product:"Adjovan Citronnelle botte",packageQty:1,packageUnit:"unit",price:250,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"citron",aliases:["citron local","citron"],product:"Adjovan Citron local x3",packageQty:3,packageUnit:"unit",price:100,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"clementine",aliases:["clémentine","clementine"],product:"Adjovan Clémentine 500 g",packageQty:500,packageUnit:"g",price:1200,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"abolo",aliases:["ablo","abolo"],product:"Adjovan Ablo A bolo x10",packageQty:10,packageUnit:"unit",price:1300,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"akassa",aliases:["akassa"],product:"Adjovan Akassa x10",packageQty:10,packageUnit:"unit",price:1300,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"atoukpou",aliases:["atoukpou"],product:"Adjovan Atoukpou x6",packageQty:6,packageUnit:"unit",price:1500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"crevette",aliases:["crevette","crevettes"],product:"Adjovan Crevette fraîche 1 kg",packageQty:1,packageUnit:"kg",price:8000,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"ecrevisse",aliases:["écrevisse","ecrevisse"],product:"Adjovan Écrevisse fraîche 1 kg",packageQty:1,packageUnit:"kg",price:6000,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"gambas",aliases:["gambas","gamba"],product:"Adjovan Gambas fraîche 500 g",packageQty:500,packageUnit:"g",price:8000,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"poisson",aliases:["belle dame","poisson belle dame"],product:"Adjovan Belle Dame 1 kg",packageQty:1,packageUnit:"kg",price:2000,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"brochet",aliases:["brochet fumé","brochet"],product:"Adjovan Brochet fumé x3",packageQty:3,packageUnit:"unit",price:2500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"capitaine",aliases:["capitaine","poisson capitaine"],product:"Adjovan Capitaine 1 kg",packageQty:1,packageUnit:"kg",price:3300,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"capitaine",aliases:["capitaine fumé"],product:"Adjovan Capitaine fumé x3",packageQty:3,packageUnit:"unit",price:1000,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"carpe",aliases:["carpe d eau douce","carpe"],product:"Adjovan Carpe eau douce 1 kg",packageQty:1,packageUnit:"kg",price:4500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"carpe",aliases:["carpe rouge"],product:"Adjovan Carpe rouge 1 kg",packageQty:1,packageUnit:"kg",price:4500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"porc",aliases:["pattes de porc","patte de porc"],product:"Adjovan Pattes de porc 1 kg",packageQty:1,packageUnit:"kg",price:1200,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"porc",aliases:["queue de porc"],product:"Adjovan Queue de porc 1 kg",packageQty:1,packageUnit:"kg",price:1600,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"porc",aliases:["rôti de porc","roti de porc"],product:"Adjovan Rôti de porc 500 g",packageQty:500,packageUnit:"g",price:3300,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"porc",aliases:["travers de porc","côte de porc","cote de porc"],product:"Adjovan Travers de porc 1 kg",packageQty:1,packageUnit:"kg",price:2000,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"porc",aliases:["porc sans peau","viande de porc"],product:"Adjovan Viande porc sans peau 500 g",packageQty:500,packageUnit:"g",price:1500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"poulet",aliases:["carcasse de poulet"],product:"Adjovan Carcasse poulet 1 kg",packageQty:1,packageUnit:"kg",price:1700,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"poulet",aliases:["patte de poulet"],product:"Adjovan Patte de poulet 500 g",packageQty:500,packageUnit:"g",price:1100,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"poulet",aliases:["poulet fumé","pondeuse fumée"],product:"Adjovan Pondeuse poulet fumée",packageQty:1,packageUnit:"unit",price:4500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"beurre",aliases:["beurre","beurre st avé"],product:"Adjovan Beurre St Avé 200 g",packageQty:200,packageUnit:"g",price:700,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"oeuf",aliases:["oeuf","œuf","oeufs","œufs"],product:"Adjovan Plaquette oeufs x15",packageQty:15,packageUnit:"unit",price:1900,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"lait",aliases:["lait entier","lait candia"],product:"Adjovan Lait entier Candia 1 L",packageQty:1,packageUnit:"L",price:1200,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"yaourt",aliases:["yaourt vanille","yaourt"],product:"Adjovan Yaourt vanille Yoplait 4x125 g",packageQty:500,packageUnit:"g",price:1200,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"mozzarella",aliases:["mozzarella","fromage mozzarella"],product:"Adjovan Mozzarella bloc 200 g",packageQty:200,packageUnit:"g",price:2300,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"creme",aliases:["crème légère","creme legere","crème à cuisiner"],product:"Adjovan Crème légère Président 20 cl",packageQty:20,packageUnit:"cl",price:1500,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"huile",aliases:["huile de tournesol","huile tournesol"],product:"Adjovan Huile tournesol Aromate 0.9 L",packageQty:0.9,packageUnit:"L",price:2100,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"huile",aliases:["huile de tournesol aya","huile aya"],product:"Adjovan Huile tournesol Aya 1 L",packageQty:1,packageUnit:"L",price:2300,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"},
-{key:"adjouvan",aliases:["adjovan","adjuévan","adjuevan"],product:"Adjovan condiment Adjuévan",packageQty:1,packageUnit:"unit",price:100,source:"Adjovan",observedAt:"2026-09-28",kind:"retail",city:"Abidjan"}
-];
-export const PRICE_CATALOG_TEXT=ABIDJAN_PRICE_CATALOG.map(x=>`${x.product} | ${x.packageQty} ${x.packageUnit} | ${x.price} FCFA | ${x.source} | ${x.observedAt}`).join("\n");
+import priceData from "../../data/food-prices-ci.json";
+
+export type PriceRef = {
+  id: string;
+  key: string;
+  aliases: string[];
+  product: string;
+  packageQty: number;
+  packageUnit: "g" | "kg" | "ml" | "cl" | "L" | "unit";
+  price: number;
+  source: string;
+  observedAt: string;
+  kind: "retail" | "market";
+  city: "Abidjan";
+  zone: string;
+  url?: string;
+  orderable: boolean;
+  availability?: string;
+  unitPrice?: number | null;
+  minPrice?: number | null;
+  maxPrice?: number | null;
+};
+
+type IngredientDef = { aliases: string[]; category: string };
+type SourceDef = [name: string, url: string, type: string];
+
+const RAW = priceData as any;
+const INGREDIENTS = RAW.ingredients as Record<string, IngredientDef>;
+const SOURCES = RAW.sources as Record<string, SourceDef>;
+
+const normalizeUnit = (value: unknown): PriceRef["packageUnit"] | null => {
+  const u = String(value ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  if (u === "kg" || u === "g" || u === "ml" || u === "cl") return u;
+  if (u === "l") return "L";
+  if (["unit", "unite", "piece", "boule"].includes(u)) return "unit";
+  return null;
+};
+
+export const PRICE_DATASET_META = RAW.meta as {
+  version: string;
+  market: string;
+  zone: string;
+  currency: string;
+  observations: number;
+};
+
+export const PRICE_POLICY = RAW.policy as {
+  never_invent_price: boolean;
+  market_benchmark_is_orderable: boolean;
+  meal_cost: string;
+  shopping_cost: string;
+  checkout_total: string;
+};
+
+export const ABIDJAN_PRICE_CATALOG: PriceRef[] = (RAW.prices as any[][]).flatMap((row) => {
+  const unit = normalizeUnit(row[5]);
+  const qty = Number(row[4]);
+  const price = Number(row[6]);
+  const key = String(row[1] ?? "");
+  const ingredient = INGREDIENTS[key];
+  const source = SOURCES[String(row[14] ?? "")];
+
+  if (!unit || !ingredient || !source || !Number.isFinite(qty) || qty <= 0 || !Number.isFinite(price)) {
+    return [];
+  }
+
+  const availability = String(row[10] ?? "");
+  if (/rupture/i.test(availability)) return [];
+
+  const productName = String(row[2] ?? "");
+  const variant = String(row[3] ?? "").trim();
+  const aliases = Array.from(
+    new Set(
+      [
+        key.replace(/_/g, " "),
+        ...ingredient.aliases,
+        productName,
+        variant
+      ].filter(Boolean)
+    )
+  );
+
+  return [{
+    id: String(row[0]),
+    key,
+    aliases,
+    product: variant ? `${productName} · ${variant}` : productName,
+    packageQty: qty,
+    packageUnit: unit,
+    price,
+    source: source[0],
+    observedAt: String(row[13] ?? PRICE_DATASET_META.version),
+    kind: row[12] === "weight" ? "market" : "retail",
+    city: "Abidjan",
+    zone: PRICE_DATASET_META.zone,
+    url: source[1] || undefined,
+    orderable: Boolean(row[11]),
+    availability,
+    unitPrice: row[7] == null ? null : Number(row[7]),
+    minPrice: row[8] == null ? null : Number(row[8]),
+    maxPrice: row[9] == null ? null : Number(row[9])
+  } satisfies PriceRef];
+});
+
+export const PRICE_CATALOG_TEXT = ABIDJAN_PRICE_CATALOG
+  .map((x) =>
+    `${x.product} | ${x.packageQty} ${x.packageUnit} | ${x.price} FCFA | ${x.source} | ${x.observedAt}`
+  )
+  .join("\n");
