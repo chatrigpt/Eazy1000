@@ -1,0 +1,105 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "onMatchHeaders": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/api/cook-plan",
+      "regex": "^/api/cook\\-plan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/cook\\-plan(?:/)?$"
+    },
+    {
+      "page": "/api/health",
+      "regex": "^/api/health(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/health(?:/)?$"
+    },
+    {
+      "page": "/api/meal-image",
+      "regex": "^/api/meal\\-image(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/meal\\-image(?:/)?$"
+    },
+    {
+      "page": "/api/meal-plan",
+      "regex": "^/api/meal\\-plan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/meal\\-plan(?:/)?$"
+    },
+    {
+      "page": "/api/pantry/scan",
+      "regex": "^/api/pantry/scan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/pantry/scan(?:/)?$"
+    },
+    {
+      "page": "/api/recipe/from-video",
+      "regex": "^/api/recipe/from\\-video(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/recipe/from\\-video(?:/)?$"
+    },
+    {
+      "page": "/api/recipe/from-video/status",
+      "regex": "^/api/recipe/from\\-video/status(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/recipe/from\\-video/status(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

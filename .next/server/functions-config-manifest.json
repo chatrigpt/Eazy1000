@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "functions": {
+    "/api/cook-plan": {},
+    "/api/meal-image": {
+      "maxDuration": 60
+    },
+    "/api/meal-plan": {},
+    "/api/pantry/scan": {},
+    "/api/recipe/from-video": {
+      "maxDuration": 60
+    },
+    "/api/recipe/from-video/status": {}
+  }
+}

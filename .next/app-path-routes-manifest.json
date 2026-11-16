@@ -1,0 +1,12 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/cook-plan/route": "/api/cook-plan",
+  "/api/health/route": "/api/health",
+  "/api/meal-image/route": "/api/meal-image",
+  "/api/meal-plan/route": "/api/meal-plan",
+  "/api/pantry/scan/route": "/api/pantry/scan",
+  "/api/recipe/from-video/route": "/api/recipe/from-video",
+  "/api/recipe/from-video/status/route": "/api/recipe/from-video/status",
+  "/page": "/"
+}

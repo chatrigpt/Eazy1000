@@ -1,0 +1,12 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/cook-plan/route": "app/api/cook-plan/route.js",
+  "/api/health/route": "app/api/health/route.js",
+  "/api/meal-image/route": "app/api/meal-image/route.js",
+  "/api/meal-plan/route": "app/api/meal-plan/route.js",
+  "/api/pantry/scan/route": "app/api/pantry/scan/route.js",
+  "/api/recipe/from-video/route": "app/api/recipe/from-video/route.js",
+  "/api/recipe/from-video/status/route": "app/api/recipe/from-video/status/route.js",
+  "/page": "app/page.js"
+}

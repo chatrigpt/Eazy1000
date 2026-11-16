@@ -1,61 +1,391 @@
 "use client";
-import {useEffect,useRef,useState} from "react";
-import {recipes,Recipe,Ingredient} from "./data";
-import {EazyAPI} from "../lib/api-client";
-import {Home,Sparkles,ShoppingBasket,UserRound,Camera,WalletCards,Target,Video,Search,ArrowRight,X,Check,Clock3,ChevronLeft,RefreshCw,ChefHat,Play,Plus,PackageOpen,CalendarDays,Lock,Unlock,Flame,Utensils,CookingPot,Pause,Scissors,RotateCw,Droplets} from "lucide-react";
 
-type Pantry={name:string;quantity:number|null;unit:string;confidence:number};
-type PlanIngredient={name:string;quantity?:number|string|null;unit?:string;estimated_price?:number;checkout_price?:number|null;product_name?:string;package_quantity?:number|string;package_unit?:string;units_to_buy?:number;quantity_used?:number|string;leftover_quantity?:number|string;leftover_unit?:string;price_source?:string;price_observed_at?:string;pantry_match?:boolean};
-type Meal={title:string;day:number;date?:string;meal:string;estimated_cost:number;match:number;reason?:string;ingredients?:PlanIngredient[];steps?:any[];image?:string;imageLoading?:boolean};
-type PlanResult={mode?:string;summary:any;meals:Meal[];shopping:any[];notice?:string};
-type Cart=Ingredient&{id:string;recipe:string;done:boolean;listId?:string;createdAt?:string;listTitle?:string};
-const money=(n:number|null|undefined)=>n==null?"À vérifier":new Intl.NumberFormat("fr-FR").format(n)+" F";
+import { useEffect, useRef, useState } from "react";
+import { CalendarDays, Home, PackageOpen, ShoppingBasket } from "lucide-react";
+import type { Recipe } from "./data";
+import { EazyAPI } from "../lib/api-client";
+import { budgetFor, DEFAULT_PROFILE, loadProfile, saveProfile, type Profile } from "./lib/profile";
+import type { Cart, Meal, Pantry, PlanResult } from "./types";
+import { Busy, Toast } from "../components/ui";
+import { FoyerSetup, Onboarding } from "../components/Welcome";
+import { CartView, PantryView, PlanView, TodayView, VideoView } from "../components/Views";
+import { DeliverySheet, MealSheet, PlannerSheet, RecipeSheet, VideoSheet } from "../components/Sheets";
+import { CookingMode } from "../components/Cooking";
 
-export default function Page(){
- const [tab,setTab]=useState("home"),[budget,setBudget]=useState(15000),[people,setPeople]=useState(2),[days,setDays]=useState(4),[goal,setGoal]=useState("Manger mieux"),[planner,setPlanner]=useState(false),[busy,setBusy]=useState(""),[toast,setToast]=useState(""),[pantry,setPantry]=useState<Pantry[]>([]),[plan,setPlan]=useState<PlanResult|null>(null),[video,setVideo]=useState<any>(null),[selected,setSelected]=useState<Recipe|null>(null),[cart,setCart]=useState<Cart[]>([]),[planMeal,setPlanMeal]=useState<Meal|null>(null),[delivery,setDelivery]=useState<any>(null),[mealSlots,setMealSlots]=useState<string[]>(["Déjeuner","Dîner"]),[videoInput,setVideoInput]=useState(""),[cookVideo,setCookVideo]=useState<any>(null),[cookMeal,setCookMeal]=useState<any>(null),[cuisines,setCuisines]=useState<string[]>(["Africaine","Occidentale","Asiatique","Arabe"]);
- const scanRef=useRef<HTMLInputElement>(null);
- useEffect(()=>{try{setPantry(JSON.parse(localStorage.getItem("eazy1000-pantry")||"[]"));setPlan(JSON.parse(localStorage.getItem("eazy1000-plan")||"null"));setVideo(JSON.parse(localStorage.getItem("eazy1000-video-result")||"null"));setCart(JSON.parse(localStorage.getItem("eazy1000-cart")||"[]"))}catch{}},[]);
- const flash=(x:string)=>{setToast(x);setTimeout(()=>setToast(""),2200)};
- const stampItems=(items:any[],title:string)=>{const createdAt=new Date().toISOString(),listId="list-"+Date.now()+"-"+Math.random().toString(36).slice(2,7);return items.map(x=>({...x,listId,createdAt,listTitle:title}))};
- const scan=async(fs:FileList|null)=>{if(!fs?.length)return;setBusy("Eazy analyse tes aliments");try{const imgs=await Promise.all(Array.from(fs).slice(0,6).map(f=>new Promise<string>((ok,ko)=>{const r=new FileReader();r.onload=()=>ok(String(r.result));r.onerror=()=>ko(r.error);r.readAsDataURL(f)})));const out:any=await EazyAPI.scanPantry(imgs);setPantry(out.items||[]);localStorage.setItem("eazy1000-pantry",JSON.stringify(out.items||[]));flash((out.items?.length||0)+" aliments ajoutés au garde-manger")}catch(e:any){flash("Analyse impossible : "+e.message)}finally{setBusy("")}};
- const generate=async()=>{if(!mealSlots.length){flash("Choisis au moins un repas");return}if(!cuisines.length){flash("Choisis au moins un type de cuisine");return}setBusy("Eazy prépare ton plan repas");try{const start_date=new Date().toISOString().slice(0,10);const out:any=await EazyAPI.createMealPlan({budget,people,days,goal,pantry,start_date,meal_slots:mealSlots,cuisines_included:cuisines,cuisines_excluded:["Africaine","Occidentale","Asiatique","Arabe"].filter(x=>!cuisines.includes(x))});out.meals=(out.meals||[]).map((m:Meal)=>({...m,imageLoading:true}));setPlan(out);setPlanner(false);setTab("plan");flash("Plan prêt · Eazy illustre les plats");Promise.allSettled(out.meals.map(async(m:Meal,i:number)=>{try{const pic:any=await EazyAPI.mealImage(m.title);setPlan((current:any)=>{if(!current)return current;const next={...current,meals:current.meals.map((x:Meal,n:number)=>n===i?{...x,image:pic.image,imageLoading:false}:x)};return next})}catch{setPlan((current:any)=>current?{...current,meals:current.meals.map((x:Meal,n:number)=>n===i?{...x,imageLoading:false}:x)}:current)}}))}catch(e:any){flash("Plan impossible : "+e.message)}finally{setBusy("")}};
- const analyzeVideo=async(urlArg?:string)=>{const url=(urlArg||videoInput).trim();if(!url){flash("Colle un lien vidéo à analyser");return;}setBusy("Eazy comprend la vidéo");try{let out:any=await EazyAPI.videoRecipe(url);if(out.status==="queued"&&out.requestId){for(let i=0;i<30;i++){await new Promise(r=>setTimeout(r,2000));out=await EazyAPI.videoStatus(out.requestId);if(out.status!=="IN_QUEUE"&&out.status!=="IN_PROGRESS")break}}setVideo(out);localStorage.setItem("eazy1000-video-result",JSON.stringify(out));setTab("video");flash("Analyse vidéo terminée")}catch(e:any){flash("Vidéo : "+e.message)}finally{setBusy("")}};
- const addRecipe=(r:Recipe)=>{const next=[...cart,...r.ingredients.filter(i=>!cart.some(c=>c.id===r.id+"-"+i.name)).map(i=>({...i,id:r.id+"-"+i.name,recipe:r.name,done:false}))];setCart(next);localStorage.setItem("eazy1000-cart",JSON.stringify(next));flash("Ajouté aux courses")};
- return <main>{toast&&<div className="toast">{toast}</div>}{busy&&<EazyFoodLoader label={busy}/>} 
- <header><div className="brand">Eazy <b>1000</b></div><span className="apiDot">LIVE</span></header>
- <section className="screen">
- {tab==="home"&&<><div className="hello"><p>Bonsoir,</p><h1>On mange bien<br/>ce soir.</h1></div><div className="search"><Search/><span>Une envie ? Un ingrédient ? Une vidéo ?</span></div>
- <div className="contextGrid"><button onClick={()=>scanRef.current?.click()}><Icon I={Camera}/><b>Scanner<br/>mes aliments</b></button><button onClick={()=>setPlanner(true)}><Icon I={WalletCards}/><b>Mon<br/>budget</b></button><button onClick={()=>setPlanner(true)}><Icon I={Target}/><b>Mon<br/>objectif</b></button><button onClick={()=>document.getElementById("video-link")?.scrollIntoView({behavior:"smooth"})}><Icon I={Video}/><b>Une<br/>vidéo</b></button></div><input hidden ref={scanRef} multiple type="file" accept="image/*" onChange={e=>scan(e.target.files)}/>
- <div id="video-link" className="videoTester"><div><small>RECETTE DEPUIS UNE VIDÉO</small><h3>Colle un lien TikTok, Instagram, YouTube ou une URL vidéo publique.</h3></div><div className="videoInput"><input value={videoInput} onChange={e=>setVideoInput(e.target.value)} placeholder="https://…" inputMode="url"/><button onClick={()=>analyzeVideo(videoInput)}><ArrowRight/></button></div><p>Le lien est envoyé au pipeline vidéo configuré. Le résultat apparaît dans l’écran Recette extraite.</p></div>{pantry.length>0&&<button className="statusCard" onClick={()=>setTab("pantry")}><div><small>GARDE-MANGER ACTIF</small><b>{pantry.length} aliments reconnus</b><span>Voir et vérifier les produits</span></div><ArrowRight/></button>}
- {plan&&<button className="planHero" onClick={()=>setTab("plan")}><small>TON DERNIER PLAN</small><h2>{plan.meals?.length||0} repas · {money(plan.summary?.estimated_total)}</h2><p>{plan.summary?.saved_by_pantry?money(plan.summary.saved_by_pantry)+" économisés grâce à ce que tu as déjà":goal}</p><ArrowRight/></button>}
- <div className="sectionTitle"><div><small>INSPIRATION</small><h2>Tu peux presque les cuisiner</h2></div></div><div className="cards">{recipes.slice(0,4).map(r=><RecipeCard key={r.id} r={r} open={()=>setSelected(r)}/>)}</div></>}
- {tab==="plan"&&<PlanView plan={plan} regenerate={()=>setPlanner(true)} openMeal={setPlanMeal} prepareMeal={(m:Meal)=>{if(!m.steps?.length){setPlanMeal(m);return}setCookMeal({recipe:{title:m.title,servings:people},steps:m.steps})}} coursesMeal={(m:Meal)=>{const items=(m.ingredients||[]).filter(x=>!x.pantry_match).map((x,i)=>({name:x.name,qty:String(x.quantity||"à prévoir")+" "+(x.unit||""),price:x.checkout_price??x.estimated_price??null,id:"meal-"+m.title+"-"+Date.now()+"-"+i,recipe:m.title,done:false}));const stamped=stampItems(items,m.title);const next=[...cart,...stamped];setCart(next);localStorage.setItem("eazy1000-cart",JSON.stringify(next));setTab("cart");flash(items.length?"Liste créée · "+items.length+" ingrédients":"Tu as déjà les ingrédients")}} addAll={()=>{const items=(plan?.shopping||[]).map((x:any,i:number)=>({name:x.name,qty:String(x.quantity||"à prévoir")+" "+(x.unit||""),price:x.checkout_price??x.estimated_price??null,id:"plan-"+i+"-"+x.name,recipe:"Plan Eazy",done:false}));const stamped=stampItems(items,"Courses · Plan repas · "+days+" jours");const next=[...cart,...stamped];setCart(next);localStorage.setItem("eazy1000-cart",JSON.stringify(next));setTab("cart");flash("Nouvelle liste de courses créée")}} deliver={()=>setDelivery({title:"Courses du plan Eazy",items:plan?.shopping||[]})}/>}
- {tab==="pantry"&&<PantryView items={pantry} rescan={()=>scanRef.current?.click()}/>}
- {tab==="video"&&<VideoView data={video} startCook={()=>setCookVideo(video)} addCourses={()=>{const items=(video?.ingredients||[]).map((x:any,i:number)=>({name:x.name,qty:(x.commercial_quantity||x.recipe_quantity||x.quantity||"à prévoir")+" "+(x.commercial_unit||x.recipe_unit||x.unit||""),price:x.estimated_price||0,id:"video-"+i+"-"+x.name,recipe:video?.recipe?.title||"Recette vidéo",done:false}));const stamped=stampItems(items,video?.recipe?.title||"Recette vidéo");const next=[...cart,...stamped];setCart(next);localStorage.setItem("eazy1000-cart",JSON.stringify(next));setTab("cart")}} deliver={()=>setDelivery({title:video?.recipe?.title||"Recette vidéo",items:video?.ingredients||[]})}/>}
- {tab==="cart"&&<CartView cart={cart} setCart={(x:Cart[])=>{setCart(x);localStorage.setItem("eazy1000-cart",JSON.stringify(x))}}/>}
- </section>
- <nav>{[["home",Home,"Aujourd’hui"],["plan",Sparkles,"Mes repas"],["cart",ShoppingBasket,"Courses"],["pantry",PackageOpen,"Garde-manger"]].map(([id,I,l]:any)=><button key={id} className={tab===id?"active":""} onClick={()=>setTab(id)}><I/><span>{l}</span></button>)}</nav>
- {planner&&<Planner budget={budget} setBudget={setBudget} people={people} setPeople={setPeople} days={days} setDays={setDays} goal={goal} setGoal={setGoal} mealSlots={mealSlots} setMealSlots={setMealSlots} cuisines={cuisines} setCuisines={setCuisines} close={()=>setPlanner(false)} run={generate}/>}
- {selected&&<RecipeModal r={selected} close={()=>setSelected(null)} add={()=>addRecipe(selected)}/>}
- {planMeal&&<PlanMealModal meal={planMeal} close={()=>setPlanMeal(null)} cook={async()=>{const meal=planMeal;setPlanMeal(null);setBusy("Eazy prépare les étapes de cuisine");try{const cooked:any=await EazyAPI.cookPlan(meal,people);setCookMeal(cooked)}catch(e:any){flash("Recette interactive : "+e.message)}finally{setBusy("")}}} add={()=>{const items=(planMeal.ingredients||[]).filter(x=>!x.pantry_match).map((x,i)=>({name:x.name,qty:String(x.quantity||"à prévoir")+" "+(x.unit||""),price:x.estimated_price||0,id:"meal-"+planMeal.title+"-"+i,recipe:planMeal.title,done:false}));const next=[...cart,...items.filter(x=>!cart.some(c=>c.id===x.id))];setCart(next);localStorage.setItem("eazy1000-cart",JSON.stringify(next));setPlanMeal(null);setTab("cart");flash("Ingrédients manquants ajoutés")}} deliver={()=>{setDelivery({title:planMeal.title,items:(planMeal.ingredients||[]).filter(x=>!x.pantry_match)});setPlanMeal(null)}}/>}
- {cookVideo&&<CookingMode data={cookVideo} close={()=>setCookVideo(null)}/>} {cookMeal&&<CookingMode data={cookMeal} close={()=>setCookMeal(null)}/>}
- {delivery&&<DeliverySheet order={delivery} close={()=>setDelivery(null)} confirm={(store:string)=>{flash("Panier préparé chez "+store);setDelivery(null)}}/>}
- </main>
+type Screen = "loading" | "onboarding" | "setup" | "edit-foyer" | "app";
+
+const TABS = [
+  { id: "home", label: "Aujourd'hui", Icon: Home },
+  { id: "plan", label: "Repas", Icon: CalendarDays },
+  { id: "cart", label: "Courses", Icon: ShoppingBasket },
+  { id: "pantry", label: "Garde-manger", Icon: PackageOpen },
+];
+
+const save = (k: string, v: unknown) => {
+  try {
+    localStorage.setItem(k, JSON.stringify(v));
+  } catch {}
+};
+
+export default function Page() {
+  const [screen, setScreen] = useState<Screen>("loading");
+  const [profile, setProfile] = useState<Profile>(DEFAULT_PROFILE);
+  const [tab, setTab] = useState("home");
+
+  // Paramètres du prochain plan (pré-remplis depuis le foyer)
+  const [budget, setBudget] = useState(15000);
+  const [people, setPeople] = useState(2);
+  const [days, setDays] = useState(4);
+  const [goal, setGoal] = useState("Manger mieux");
+  const [mealSlots, setMealSlots] = useState<string[]>(["Déjeuner", "Dîner"]);
+  const [cuisines, setCuisines] = useState<string[]>([]);
+
+  const [planner, setPlanner] = useState(false);
+  const [videoSheet, setVideoSheet] = useState(false);
+  const [busy, setBusy] = useState("");
+  const [toast, setToast] = useState("");
+  const [pantry, setPantry] = useState<Pantry[]>([]);
+  const [plan, setPlan] = useState<PlanResult | null>(null);
+  const [video, setVideo] = useState<any>(null);
+  const [selected, setSelected] = useState<Recipe | null>(null);
+  const [cart, setCart] = useState<Cart[]>([]);
+  const [planMeal, setPlanMeal] = useState<Meal | null>(null);
+  const [delivery, setDelivery] = useState<any>(null);
+  const [cookData, setCookData] = useState<any>(null);
+  const scanRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const p = loadProfile();
+    setProfile(p);
+    try {
+      setPantry(JSON.parse(localStorage.getItem("eazy1000-pantry") || "[]"));
+      setPlan(JSON.parse(localStorage.getItem("eazy1000-plan") || "null"));
+      setVideo(JSON.parse(localStorage.getItem("eazy1000-video-result") || "null"));
+      setCart(JSON.parse(localStorage.getItem("eazy1000-cart") || "[]"));
+    } catch {}
+    setScreen(p.onboarded ? "app" : "onboarding");
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [tab]);
+
+  const flash = (x: string) => {
+    setToast(x);
+    setTimeout(() => setToast(""), 2400);
+  };
+  const updateCart = (next: Cart[]) => {
+    setCart(next);
+    save("eazy1000-cart", next);
+  };
+  const stampItems = (items: any[], title: string) => {
+    const createdAt = new Date().toISOString();
+    const listId = "list-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
+    return items.map((x) => ({ ...x, listId, createdAt, listTitle: title }));
+  };
+
+  const openPlanner = () => {
+    setPeople(profile.people);
+    setGoal(profile.goal);
+    setMealSlots(profile.mealSlots);
+    setCuisines(profile.cuisines);
+    setBudget(budgetFor(profile.weeklyBudget, days));
+    setPlanner(true);
+  };
+  const changeDays = (d: number) => {
+    setDays(d);
+    setBudget(budgetFor(profile.weeklyBudget, d));
+  };
+
+  /* ---------- Actions (logique d'origine conservée) ---------- */
+  const scan = async (fs: FileList | null) => {
+    if (!fs?.length) return;
+    setBusy("Eazy analyse tes aliments");
+    try {
+      const imgs = await Promise.all(
+        Array.from(fs)
+          .slice(0, 6)
+          .map(
+            (f) =>
+              new Promise<string>((ok, ko) => {
+                const r = new FileReader();
+                r.onload = () => ok(String(r.result));
+                r.onerror = () => ko(r.error);
+                r.readAsDataURL(f);
+              }),
+          ),
+      );
+      const out: any = await EazyAPI.scanPantry(imgs);
+      setPantry(out.items || []);
+      save("eazy1000-pantry", out.items || []);
+      setTab("pantry");
+      flash((out.items?.length || 0) + " aliments ajoutés au garde-manger");
+    } catch (e: any) {
+      flash("Analyse impossible : " + e.message);
+    } finally {
+      setBusy("");
+      if (scanRef.current) scanRef.current.value = "";
+    }
+  };
+
+  const generate = async () => {
+    if (!mealSlots.length) return flash("Choisis au moins un repas");
+    if (!cuisines.length) return flash("Choisis au moins un type de cuisine");
+    setPlanner(false);
+    setBusy("Eazy prépare ton plan repas");
+    try {
+      const start_date = new Date().toISOString().slice(0, 10);
+      const all = ["Africaine", "Occidentale", "Asiatique", "Arabe"];
+      const out: any = await EazyAPI.createMealPlan({
+        budget,
+        people,
+        days,
+        goal,
+        pantry,
+        start_date,
+        meal_slots: mealSlots,
+        cuisines_included: cuisines,
+        cuisines_excluded: all.filter((x) => !cuisines.includes(x)),
+      });
+      out.meals = (out.meals || []).map((m: Meal) => ({ ...m, imageLoading: true }));
+      setPlan(out);
+      save("eazy1000-plan", out);
+      setTab("plan");
+      flash("Plan prêt. Eazy illustre les plats.");
+      Promise.allSettled(
+        out.meals.map(async (m: Meal, i: number) => {
+          let image: string | undefined;
+          try {
+            const pic: any = await EazyAPI.mealImage(m.title);
+            image = pic.image;
+          } catch {}
+          setPlan((cur) => {
+            if (!cur) return cur;
+            const next = { ...cur, meals: cur.meals.map((x, n) => (n === i ? { ...x, image, imageLoading: false } : x)) };
+            save("eazy1000-plan", next);
+            return next;
+          });
+        }),
+      );
+    } catch (e: any) {
+      flash("Plan impossible : " + e.message);
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const analyzeVideo = async (url: string) => {
+    setVideoSheet(false);
+    setBusy("Eazy regarde la vidéo");
+    try {
+      let out: any = await EazyAPI.videoRecipe(url);
+      if (out.status === "queued" && out.requestId) {
+        for (let i = 0; i < 30; i++) {
+          await new Promise((r) => setTimeout(r, 2000));
+          out = await EazyAPI.videoStatus(out.requestId);
+          if (out.status !== "IN_QUEUE" && out.status !== "IN_PROGRESS") break;
+        }
+      }
+      setVideo(out);
+      save("eazy1000-video-result", out);
+      setTab("video");
+      flash("Recette extraite de la vidéo");
+    } catch (e: any) {
+      flash("Vidéo : " + e.message);
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const addRecipe = (r: Recipe) => {
+    const items = r.ingredients
+      .filter((i) => !cart.some((c) => c.id === r.id + "-" + i.name))
+      .map((i) => ({ ...i, id: r.id + "-" + i.name, recipe: r.name, done: false }));
+    updateCart([...cart, ...stampItems(items, r.name)]);
+    setSelected(null);
+    setTab("cart");
+    flash("Ingrédients ajoutés à tes courses");
+  };
+
+  const mealItems = (m: Meal, prefix: string) =>
+    (m.ingredients || [])
+      .filter((x) => !x.pantry_match)
+      .map((x, i) => ({
+        name: x.name,
+        qty: String(x.quantity || "à prévoir") + " " + (x.unit || ""),
+        price: x.checkout_price ?? x.estimated_price ?? null,
+        id: prefix + "-" + m.title + "-" + Date.now() + "-" + i,
+        recipe: m.title,
+        done: false,
+      }));
+
+  const coursesMeal = (m: Meal) => {
+    const items = mealItems(m, "meal") as any[];
+    updateCart([...cart, ...stampItems(items, m.title)]);
+    setPlanMeal(null);
+    setTab("cart");
+    flash(items.length ? `Ticket créé, ${items.length} ingrédients` : "Tu as déjà tous les ingrédients");
+  };
+
+  const addAllPlan = () => {
+    const items = (plan?.shopping || []).map((x: any, i: number) => ({
+      name: x.name,
+      qty: String(x.quantity || "à prévoir") + " " + (x.unit || ""),
+      price: x.checkout_price ?? x.estimated_price ?? null,
+      id: "plan-" + i + "-" + x.name,
+      recipe: "Plan Eazy",
+      done: false,
+    }));
+    updateCart([...cart, ...stampItems(items, `Plan de ${days} jour${days > 1 ? "s" : ""}`)]);
+    setTab("cart");
+    flash("Ticket de courses du plan créé");
+  };
+
+  const cookMeal = async (m: Meal) => {
+    setPlanMeal(null);
+    if (m.steps?.length) return setCookData({ recipe: { title: m.title, servings: people }, steps: m.steps });
+    setBusy("Eazy prépare les étapes de cuisine");
+    try {
+      const cooked: any = await EazyAPI.cookPlan(m, profile.people);
+      setCookData(cooked);
+    } catch (e: any) {
+      flash("Recette interactive : " + e.message);
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const videoCourses = () => {
+    const items = (video?.ingredients || []).map((x: any, i: number) => ({
+      name: x.name,
+      qty: (x.commercial_quantity || x.recipe_quantity || x.quantity || "à prévoir") + " " + (x.commercial_unit || x.recipe_unit || x.unit || ""),
+      price: x.estimated_price || 0,
+      id: "video-" + i + "-" + x.name,
+      recipe: video?.recipe?.title || "Recette vidéo",
+      done: false,
+    }));
+    updateCart([...cart, ...stampItems(items, video?.recipe?.title || "Recette vidéo")]);
+    setTab("cart");
+  };
+
+  /* ---------- Écrans ---------- */
+  if (screen === "loading") return <main className="app" />;
+  if (screen === "onboarding") return <Onboarding done={() => setScreen("setup")} />;
+  if (screen === "setup" || screen === "edit-foyer")
+    return (
+      <FoyerSetup
+        initial={profile}
+        cancel={screen === "edit-foyer" ? () => setScreen("app") : () => setScreen("onboarding")}
+        save={(p) => {
+          setProfile(p);
+          saveProfile(p);
+          setScreen("app");
+          if (screen === "setup") flash("Foyer enregistré. Planifions ta semaine.");
+        }}
+      />
+    );
+
+  return (
+    <main className="app">
+      {toast && <Toast text={toast} />}
+      {busy && <Busy label={busy} />}
+      <input hidden ref={scanRef} multiple type="file" accept="image/*" onChange={(e) => scan(e.target.files)} />
+
+      <section className="screen">
+        {tab === "home" && (
+          <TodayView
+            people={profile.people}
+            plan={plan}
+            pantry={pantry}
+            video={video}
+            editFoyer={() => setScreen("edit-foyer")}
+            openPlanner={openPlanner}
+            scan={() => scanRef.current?.click()}
+            openVideo={() => setVideoSheet(true)}
+            openRecipe={setSelected}
+            openMeal={setPlanMeal}
+            cookMeal={cookMeal}
+            goTab={setTab}
+          />
+        )}
+        {tab === "plan" && (
+          <PlanView
+            plan={plan}
+            regenerate={openPlanner}
+            openMeal={setPlanMeal}
+            prepareMeal={cookMeal}
+            coursesMeal={coursesMeal}
+            addAll={addAllPlan}
+            deliver={() => setDelivery({ title: "Courses du plan", items: plan?.shopping || [] })}
+          />
+        )}
+        {tab === "cart" && (
+          <CartView cart={cart} setCart={updateCart} deliver={(title, items) => setDelivery({ title, items })} openPlanner={openPlanner} />
+        )}
+        {tab === "pantry" && <PantryView items={pantry} rescan={() => scanRef.current?.click()} />}
+        {tab === "video" && (
+          <VideoView
+            data={video}
+            startCook={() => setCookData(video)}
+            addCourses={videoCourses}
+            deliver={() => setDelivery({ title: video?.recipe?.title || "Recette vidéo", items: video?.ingredients || [] })}
+            openVideo={() => setVideoSheet(true)}
+          />
+        )}
+      </section>
+
+      <nav className="tabbar" aria-label="Navigation">
+        {TABS.map(({ id, label, Icon }) => (
+          <button key={id} className={tab === id ? "on" : ""} onClick={() => setTab(id)} aria-current={tab === id}>
+            <Icon />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
+
+      {planner && (
+        <PlannerSheet
+          budget={budget}
+          setBudget={setBudget}
+          people={people}
+          setPeople={setPeople}
+          days={days}
+          setDays={changeDays}
+          goal={goal}
+          setGoal={setGoal}
+          mealSlots={mealSlots}
+          setMealSlots={setMealSlots}
+          cuisines={cuisines}
+          setCuisines={setCuisines}
+          close={() => setPlanner(false)}
+          run={generate}
+        />
+      )}
+      {videoSheet && <VideoSheet close={() => setVideoSheet(false)} analyze={analyzeVideo} />}
+      {selected && <RecipeSheet r={selected} close={() => setSelected(null)} add={() => addRecipe(selected)} />}
+      {planMeal && (
+        <MealSheet
+          meal={planMeal}
+          close={() => setPlanMeal(null)}
+          cook={() => cookMeal(planMeal)}
+          add={() => coursesMeal(planMeal)}
+          deliver={() => {
+            setDelivery({ title: planMeal.title, items: (planMeal.ingredients || []).filter((x) => !x.pantry_match) });
+            setPlanMeal(null);
+          }}
+        />
+      )}
+      {cookData && <CookingMode data={cookData} close={() => setCookData(null)} />}
+      {delivery && (
+        <DeliverySheet
+          order={delivery}
+          close={() => setDelivery(null)}
+          confirm={(store) => {
+            flash("Panier préparé chez " + store);
+            setDelivery(null);
+          }}
+        />
+      )}
+    </main>
+  );
 }
-function Icon({I}:{I:any}){return <span className="glyph"><I/></span>}
-function Planner({budget,setBudget,people,setPeople,days,setDays,goal,setGoal,mealSlots,setMealSlots,cuisines,setCuisines,close,run}:any){const goals=["Manger mieux","Petit budget","Perdre du poids","Faire avec ce que j’ai","Me régaler"],slots=["Petit-déjeuner","Déjeuner","Dîner","Goûter","Collation"];const toggle=(x:string)=>setMealSlots((v:string[])=>v.includes(x)?v.filter(y=>y!==x):[...v,x]);return <div className="overlay top"><div className="sheet plan"><button className="close" onClick={close}><X/></button><p className="eyebrow">CRÉER MON PLAN</p><h1>Quel est le plan ?</h1><p className="muted">Choisis les moments que tu veux planifier. Eazy les répétera chaque jour sur la durée choisie.</p><div className="mealSlotGrid">{slots.map(x=><button key={x} className={mealSlots.includes(x)?"selectedSlot":""} onClick={()=>toggle(x)}><span>{mealSlots.includes(x)?<Check/>:<Plus/>}</span><b>{x}</b><small>{x==="Goûter"||x==="Collation"?"Optionnel":"Repas"}</small></button>)}</div><div className="goalRow">{goals.map(g=><button key={g} className={goal===g?"chosen":""} onClick={()=>setGoal(g)}>{g}</button>)}</div><div><small>TYPES DE CUISINE</small><p className="muted">Décoche ce que tu veux exclure des recommandations.</p><div className="mealSlotGrid">{["Africaine","Occidentale","Asiatique","Arabe"].map(x=><button key={x} className={cuisines.includes(x)?"selectedSlot":""} onClick={()=>setCuisines((v:string[])=>v.includes(x)?v.filter(y=>y!==x):[...v,x])}><span>{cuisines.includes(x)?<Check/>:<Plus/>}</span><b>{x}</b><small>{cuisines.includes(x)?"Incluse":"Exclue"}</small></button>)}</div></div><div className="budgetBox"><small>MON BUDGET</small><b>{money(budget)}</b><input type="range" min="2000" max="100000" step="500" value={budget} onChange={e=>setBudget(Number(e.target.value))}/><div><span>2 000 F</span><span>100 000 F</span></div></div><div className="counters"><Counter label="Personnes" value={people} set={setPeople} min={1} max={12}/><Counter label="Jours" value={days} set={setDays} min={1} max={14}/></div><div className="calendarPreview"><CalendarDays/><div><small>CALENDRIER</small><b>{days} jour{days>1?"s":""} · {mealSlots.length} créneau{mealSlots.length>1?"x":""}/jour</b><span>{days*mealSlots.length} propositions seront générées à partir d’aujourd’hui</span></div></div><button className="cta" onClick={run}>Générer mon calendrier <Sparkles/></button></div></div>}
-function Counter({label,value,set,min,max}:any){return <div><small>{label}</small><section><button onClick={()=>set(Math.max(min,value-1))}>−</button><b>{value}</b><button onClick={()=>set(Math.min(max,value+1))}>+</button></section></div>}
-function PlanView({plan,regenerate,openMeal,prepareMeal,coursesMeal,addAll,deliver}:{plan:PlanResult|null;regenerate:any;openMeal:any;prepareMeal:any;coursesMeal:any;addAll:any;deliver:any}){if(!plan)return <Empty title="Aucun plan pour le moment." action="Créer mon plan" go={regenerate}/>;const groups=plan.meals.reduce((a:any,m:Meal)=>{const k=m.date||String(m.day);(a[k]??=[]).push(m);return a},{});const label=(d:string,ms:Meal[])=>{if(!ms[0]?.date)return "Jour "+ms[0]?.day;const dt=new Date(ms[0].date+"T12:00:00");return new Intl.DateTimeFormat("fr-FR",{weekday:"long",day:"numeric",month:"long"}).format(dt)};return <><div className="hello compact"><p>TON PLAN REPAS</p><h1>{plan.meals.length} moments à savourer.</h1></div><div className="resultSummary"><div><small>BUDGET</small><b>{money(plan.summary?.budget)}</b></div><div><small>ESTIMATION</small><b>{money(plan.summary?.estimated_total)}</b></div><div><small>ÉCONOMISÉ</small><b>{money(plan.summary?.saved_by_pantry)}</b></div></div><div className="dayGroups">{Object.entries(groups).map(([date,meals]:any)=><section key={date}><div className="dayHead"><span>{String(meals[0].day).padStart(2,"0")}</span><div><small>JOUR {meals[0].day}</small><h2>{label(date,meals)}</h2></div></div><div className="mealResults">{meals.map((m:Meal,i:number)=><article key={i} onClick={()=>openMeal(m)}>{m.image?<img src={m.image} alt={m.title}/>:<span className={m.imageLoading?"mealImageLoading":""}>{m.imageLoading?<span className="mealPhotoSpinner"><i/><ChefHat/></span>:m.meal.slice(0,2).toUpperCase()}</span>}<div><small>{m.meal}</small><h3>{m.title}</h3><p>{m.reason||"Voir ingrédients, courses et livraison."}</p></div><div className="mealQuickActions"><button onClick={(e)=>{e.stopPropagation();prepareMeal(m)}}><Play/> Préparer</button><button onClick={(e)=>{e.stopPropagation();coursesMeal(m)}}><ShoppingBasket/> Courses</button></div></article>)}</div></section>)}</div><div className="planActions"><button onClick={addAll}><ShoppingBasket/> Liste de courses</button><button className="dark" onClick={deliver}><PackageOpen/> Faire livrer</button></div><button className="cook" onClick={regenerate}><RefreshCw/> Modifier mon plan repas</button>{plan.notice&&<p className="notice">{plan.notice}</p>}</>}
-function PantryView({items,rescan}:{items:Pantry[];rescan:any}){return <><div className="hello compact"><p>TON CONTEXTE CUISINE</p><h1>Ton garde-manger.</h1></div><div className="pantryList">{items.map((x,i)=><article key={i}><span>{String(i+1).padStart(2,"0")}</span><div><b>{x.name}</b><small>{x.quantity==null?"Quantité à confirmer":x.quantity+" "+x.unit}</small></div><strong>{Math.round(x.confidence*100)}%</strong></article>)}</div><button className="cta" onClick={rescan}><Camera/> Ajouter des photos</button></>}
-function VideoView({data,startCook,addCourses,deliver}:{data:any;startCook:any;addCourses:any;deliver:any}){if(!data)return <Empty title="Aucune vidéo analysée."/>;const rec=data.recipe||{};return <><div className="hello compact"><p>RECETTE EXTRAITE</p><h1>{rec.title||"Analyse vidéo"}</h1><small>{rec.servings||2} personnes · {rec.servings_source==="source"?"indiqué dans la vidéo":"portion Eazy par défaut"}</small></div><div className="videoActions"><button onClick={startCook}><Play/> Cuisiner étape par étape</button><button onClick={addCourses}><ShoppingBasket/> Je fais mes courses</button><button className="dark" onClick={deliver}><PackageOpen/> Faire livrer</button></div><h2 className="subhead">Ingrédients</h2><div className="pantryList">{(data.ingredients||[]).map((x:any,i:number)=><article key={i}><span>{String(i+1).padStart(2,"0")}</span><div><b>{x.name}</b><small>{x.recipe_quantity??x.quantity??"Quantité à ajuster"} {x.recipe_unit||x.unit||""}{x.commercial_quantity?" · achat "+x.commercial_quantity+" "+(x.commercial_unit||""):""}</small></div></article>)}</div><h2 className="subhead">Étapes</h2><div className="steps">{(data.steps||[]).map((x:any,i:number)=><article key={i}><b>{i+1}</b><p>{x.instruction}</p>{x.timer_seconds&&<small>{Math.ceil(x.timer_seconds/60)} min</small>}</article>)}</div></>}
-
-function CookingMode({data,close}:{data:any;close:any}){const steps=data.steps||[];const [idx,setIdx]=useState(0),[locked,setLocked]=useState(false),[paused,setPaused]=useState(false);const step=steps[idx]||{};const initial=Math.max(0,Number(step.timer_seconds||0));const [left,setLeft]=useState(initial);useEffect(()=>{setLeft(Math.max(0,Number((steps[idx]||{}).timer_seconds||0)));setLocked(false);setPaused(false)},[idx]);useEffect(()=>{if(!left||locked||paused)return;const t=setInterval(()=>setLeft(v=>{if(v<=1){clearInterval(t);if(idx<steps.length-1)setTimeout(()=>setIdx(i=>Math.min(i+1,steps.length-1)),180);return 0}return v-1}),1000);return()=>clearInterval(t)},[idx,locked,paused,left>0]);if(!steps.length)return <div className="overlay top"><div className="cookScreen"><button className="cookClose" onClick={close}><X/></button><h1>Étapes indisponibles</h1></div></div>;const heat=step.heat||{},phase=step.phase|| (step.inferred?"prep":"cook"),scene=step.scene_type||"other";const phaseLabel=phase==="prep"?"MISE EN PLACE":phase==="plate"?"DRESSAGE":"CUISSON";const Visual=scene.includes("cut")||scene.includes("chop")?Scissors:scene==="prep_wash"?Droplets:scene==="mix"?RotateCw:scene==="fry"||scene==="sear"||scene==="simmer"||scene==="boil"?Flame:CookingPot;const progress=((idx+1)/steps.length)*100;return <div className="overlay top"><div className={"cookScreen scene-"+scene}><div className="cookTop"><button onClick={close}><X/></button><div className="cookProgress"><i style={{width:progress+"%"}}/><span>{phaseLabel} · {idx+1}/{steps.length}</span></div><b>{data.recipe?.servings||2} pers.</b></div><div className="motionStage"><div className="sceneOrb"><Visual/></div><div className="motionLines"><i/><i/><i/></div><strong>{step.action_title||step.movement||"Préparer"}</strong>{step.expected_result&&<p>Objectif · {step.expected_result}</p>}</div><div className="cookCopy"><div className="stepKicker"><span>{phaseLabel}</span>{step.inferred&&<b>COMPLÉTÉ PAR EAZY</b>}</div><h1>{step.instruction}</h1>{(step.ingredient_actions||[]).length>0&&<div className="ingredientRail">{step.ingredient_actions.map((a:any,i:number)=><article key={i}><span>{String(i+1).padStart(2,"0")}</span><div><b>{a.ingredient}</b><small>{a.quantity!=null?a.quantity+" "+(a.unit||""):"Selon besoin"}{a.prep_shape?" · "+a.prep_shape:""}</small></div></article>)}</div>}<div className="hudRow">{step.tool&&<div><Utensils/><span><small>OUTIL</small><b>{step.tool}</b></span></div>}{heat.enabled&&<div><Flame/><span><small>INTENSITÉ</small><b>{heat.intensity|| (heat.temperature_c?heat.temperature_c+" °C":"À ajuster")}</b></span></div>}{initial>0&&<div className="timerHud"><Clock3/><span><small>MINUTEUR</small><b>{Math.floor(left/60)}:{String(left%60).padStart(2,"0")}</b></span></div>}</div>{initial>0&&<div className="timerControls"><button onClick={()=>setPaused(!paused)}>{paused?<Play/>:<Pause/>}{paused?"Reprendre":"Pause"}</button><button onClick={()=>setLeft(v=>v+30)}><Plus/>30 sec</button><button className={locked?"active":""} onClick={()=>setLocked(!locked)}>{locked?<Lock/>:<Unlock/>}{locked?"Manuel":"Auto"}</button></div>}{step.expected_result&&<div className="readyWhen"><Check/><div><small>PRÊT QUAND</small><b>{step.expected_result}</b></div></div>}<div className="cookNav"><button disabled={idx===0} onClick={()=>setIdx(i=>Math.max(0,i-1))}><ChevronLeft/> Précédent</button><button className="next" onClick={()=>idx===steps.length-1?close():setIdx(i=>i+1)}>{idx===steps.length-1?"Terminer":"C’est fait"} <ArrowRight/></button></div></div></div></div>}
-function CartView({cart,setCart}:any){if(!cart.length)return <Empty title="Ta liste de courses est vide."/>;const legacy="legacy";const groups=cart.reduce((a:any,x:any)=>{const k=x.listId||legacy;(a[k]??=[]).push(x);return a},{});const entries=Object.entries(groups).sort((a:any,b:any)=>String(b[1][0]?.createdAt||"").localeCompare(String(a[1][0]?.createdAt||"")));const grand=cart.reduce((a:number,x:any)=>a+Number(x.price||0),0);const fmt=(iso?:string)=>iso?new Intl.DateTimeFormat("fr-FR",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(iso)):"Ancienne liste";return <><div className="hello compact"><p>MES COURSES</p><h1>{entries.length} liste{entries.length>1?"s":""} · {money(grand)}</h1><small>Total cumulé de toutes tes listes</small></div><div className="shoppingHistory">{entries.map(([id,items]:any)=>{const total=items.reduce((a:number,x:any)=>a+Number(x.price||0),0),remaining=items.filter((x:any)=>!x.done).length;return <section className="shoppingBill" key={id}><div className="billHead"><div><small>{fmt(items[0]?.createdAt)}</small><h2>{items[0]?.listTitle||items[0]?.recipe||"Liste de courses"}</h2><span>{remaining} restant{remaining>1?"s":""} · {items.length} produit{items.length>1?"s":""}</span></div><strong>{money(total)}</strong></div><div className="billLines">{items.map((x:any,i:number)=><article key={(x.id||i)+"-"+id} onClick={()=>setCart(cart.map((y:any)=>y===x?{...y,done:!y.done}:y))} className={x.done?"checked":""}><span>{x.done?<Check/>:String(i+1).padStart(2,"0")}</span><div><b>{x.name}</b><small>{x.qty} · {x.recipe}</small></div><strong>{money(x.price)}</strong></article>)}</div><div className="billTotal"><span>Total de la liste</span><b>{money(total)}</b></div></section>})}</div></>}
-function RecipeCard({r,open}:{r:Recipe;open:any}){return <button className="recipeCard" onClick={open}><div className="food" style={{backgroundImage:`linear-gradient(180deg,transparent 35%,rgba(12,8,5,.72)),url("${r.image}")`}}><span className="match"><b>{r.match}</b><small>Eazy Match</small></span><div className="foodTitle"><b>{r.name}</b><small>{r.owned}% déjà chez toi</small></div></div><div className="cardText"><span><Clock3/>{r.time} min</span><strong>≈ {money(r.price)}</strong></div></button>}
-function RecipeModal({r,close,add}:{r:Recipe;close:any;add:any}){return <div className="overlay"><div className="sheet"><button className="close" onClick={close}><X/></button><div className="heroFood" style={{backgroundImage:`linear-gradient(180deg,transparent 45%,rgba(10,7,4,.82)),url("${r.image}")`}}><div><small>{r.origin}</small><h1>{r.name}</h1></div></div><div className="recipeBody">{r.ingredients.map((i,n)=><div className="ingredient" key={i.name}><span className="ingredientMark">{String(n+1).padStart(2,"0")}</span><div><b>{i.name}</b><small>{i.qty} · {money(i.price)}</small></div></div>)}<button className="cta" onClick={add}><Plus/> Ajouter aux courses</button><button className="cook"><Play/> Commencer à cuisiner</button></div></div></div>}
-function EazyFoodLoader({label}:{label:string}){const calendar=label.toLowerCase().includes("plan repas"),video=label.toLowerCase().includes("vidéo");return <div className={"working foodLoader "+(calendar?"calendarLoader":video?"videoLoader":"pantryLoader")}><div className="foodMagic"><span className="magicStar s1">✦</span><span className="magicStar s2">✧</span><span className="magicStar s3">✦</span><div className="ingredient ing1"><i/></div><div className="ingredient ing2"><i/></div><div className="ingredient ing3"><i/></div>{calendar?<><div className="plateBuild"><span/><i/><b/></div><div className="mealEcho e1"/><div className="mealEcho e2"/><div className="mealEcho e3"/></>:<><div className="potBuild"><CookingPot/></div><div className="stirTrail"/></>}</div><b>{label}</b><span>{calendar?"Eazy compose ton plan repas…":video?"Les ingrédients prennent forme…":"Eazy reconnaît ce que tu as…"}</span><div className="loaderSteps"><i/><i/><i/></div></div>}
-
-function Empty({title,action,go}:{title:string;action?:string;go?:any}){return <div className="empty"><Sparkles/><h2>{title}</h2>{action&&<button className="cta" onClick={go}>{action}</button>}</div>}
-
-function PlanMealModal({meal,close,add,deliver,cook}:{meal:Meal;close:any;add:any;deliver:any;cook:any}){const missing=(meal.ingredients||[]).filter(x=>!x.pantry_match);return <div className="overlay"><div className="sheet plan"><button className="close" onClick={close}><X/></button><p className="eyebrow">RECETTE DU PLAN</p><h1>{meal.title}</h1><p className="muted">{meal.reason}</p><div className="owned"><b>{(meal.ingredients||[]).length-missing.length}/{(meal.ingredients||[]).length} ingrédients déjà chez toi</b><small>{missing.length} à compléter</small><i style={{width:((meal.ingredients?.length||1)-missing.length)/(meal.ingredients?.length||1)*100+"%"}}/></div><div className="pantryList">{(meal.ingredients||[]).map((x,i)=><article key={i}><span>{x.pantry_match?<Check/>:String(i+1).padStart(2,"0")}</span><div><b>{x.name}</b><small>{x.quantity??"à prévoir"} {x.unit||""}</small></div><strong>{x.pantry_match?"Déjà là":money(x.estimated_price||0)}</strong></article>)}</div><button className="cta" onClick={cook}><Play/> Préparer maintenant</button><div className="planActions"><button onClick={add}><ShoppingBasket/> Liste gamifiée</button><button className="dark" onClick={deliver}><PackageOpen/> Faire livrer</button></div></div></div>}
-function DeliverySheet({order,close,confirm}:{order:any;close:any;confirm:any}){const [store,setStore]=useState("Allo Market");const stores=["Allo Market","Supermarché partenaire","Commerce de proximité"];const subtotal=(order.items||[]).reduce((a:number,x:any)=>a+(x.estimated_price||0),0);return <div className="overlay top"><div className="sheet delivery"><button className="close" onClick={close}><X/></button><p className="eyebrow">LIVRAISON</p><h1>Où faire les courses ?</h1><p className="muted">Choisis l’établissement qui préparera les ingrédients manquants.</p><div className="storeGrid">{stores.map(x=><button key={x} className={store===x?"selectedStore":""} onClick={()=>setStore(x)}><PackageOpen/><b>{x}</b><small>{x==="Allo Market"?"Partenaire simulé pour la démo":"Connexion à venir"}</small></button>)}</div><div className="orderBox">{(order.items||[]).map((x:any,i:number)=><div key={i}><span>{x.name}</span><b>{money(x.estimated_price||0)}</b></div>)}<div className="total"><strong>Produits estimés</strong><strong>{money(subtotal)}</strong></div><div><small>Livraison estimée</small><b>{money(1500)}</b></div><div className="total"><strong>Total indicatif</strong><strong>{money(subtotal+1500)}</strong></div></div><button className="cta" onClick={()=>confirm(store)}>Préparer chez {store} <ArrowRight/></button></div></div>}
