@@ -23,5 +23,5 @@ export function img(name: string, width = 750): string {
   if (!id) return "";
   const src = `https://cdn.doculator.org/images/${id}/${id}.png`;
   const w = ALLOWED_W.find((x) => x >= width) ?? 1080;
-  return `/_next/image?url=${encodeURIComponent(src)}&w=${w}&q=78`;
+  return `/_next/image?url=${encodeURIComponent(src)}&w=${w}&q=75`;
 }
