@@ -16,7 +16,7 @@ type Screen = "loading" | "onboarding" | "setup" | "edit-foyer" | "app";
 
 const TABS = [
   { id: "home", label: "Aujourd'hui", Icon: Home },
-  { id: "plan", label: "Repas", Icon: CalendarDays },
+  { id: "plan", label: "Mon plan", Icon: CalendarDays },
   { id: "cart", label: "Courses", Icon: ShoppingBasket },
   { id: "pantry", label: "Garde-manger", Icon: PackageOpen },
 ];
@@ -39,6 +39,9 @@ export default function Page() {
   const [goal, setGoal] = useState("Manger mieux");
   const [mealSlots, setMealSlots] = useState<string[]>(["Déjeuner", "Dîner"]);
   const [cuisines, setCuisines] = useState<string[]>([]);
+  const [diet, setDiet] = useState<string[]>([]);
+  const [health, setHealth] = useState<string[]>([]);
+  const [notes, setNotes] = useState("");
 
   const [planner, setPlanner] = useState(false);
   const [videoSheet, setVideoSheet] = useState(false);
@@ -89,6 +92,9 @@ export default function Page() {
     setGoal(profile.goal);
     setMealSlots(profile.mealSlots);
     setCuisines(profile.cuisines);
+    setDiet(profile.diet || []);
+    setHealth(profile.health || []);
+    setNotes(profile.notes || "");
     setBudget(budgetFor(profile.weeklyBudget, days));
     setPlanner(true);
   };
@@ -132,7 +138,7 @@ export default function Page() {
     if (!mealSlots.length) return flash("Choisis au moins un repas");
     if (!cuisines.length) return flash("Choisis au moins un type de cuisine");
     setPlanner(false);
-    setBusy("Eazy prépare ton plan repas");
+    setBusy("Eazy compose ton plan sur mesure");
     try {
       const start_date = new Date().toISOString().slice(0, 10);
       const all = ["Africaine", "Occidentale", "Asiatique", "Arabe"];
@@ -146,7 +152,13 @@ export default function Page() {
         meal_slots: mealSlots,
         cuisines_included: cuisines,
         cuisines_excluded: all.filter((x) => !cuisines.includes(x)),
+        preferences: [...diet, ...(notes.trim() ? [`Allergies ou aliments interdits : ${notes.trim()}`] : [])],
+        health,
       });
+      // Les choix faits dans le planificateur deviennent le profil par défaut
+      const nextProfile = { ...profile, diet, health, notes, people, goal, mealSlots, cuisines };
+      setProfile(nextProfile);
+      saveProfile(nextProfile);
       out.meals = (out.meals || []).map((m: Meal) => ({ ...m, imageLoading: true }));
       setPlan(out);
       save("eazy1000-plan", out);
@@ -294,7 +306,7 @@ export default function Page() {
       <section className="screen">
         {tab === "home" && (
           <TodayView
-            people={profile.people}
+            profile={profile}
             plan={plan}
             pantry={pantry}
             video={video}
@@ -310,6 +322,8 @@ export default function Page() {
         )}
         {tab === "plan" && (
           <PlanView
+            profile={profile}
+            editFoyer={() => setScreen("edit-foyer")}
             plan={plan}
             regenerate={openPlanner}
             openMeal={setPlanMeal}
@@ -357,6 +371,12 @@ export default function Page() {
           setMealSlots={setMealSlots}
           cuisines={cuisines}
           setCuisines={setCuisines}
+          diet={diet}
+          setDiet={setDiet}
+          health={health}
+          setHealth={setHealth}
+          notes={notes}
+          setNotes={setNotes}
           close={() => setPlanner(false)}
           run={generate}
         />

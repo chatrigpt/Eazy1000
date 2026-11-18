@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ArrowRight, Check, ClipboardPaste, PackageOpen, Play, Plus, ShoppingBasket, Sparkles } from "lucide-react";
 import type { Recipe } from "../app/data";
-import { CUISINES, GOALS, SLOTS } from "../app/lib/profile";
+import { CUISINES, DIETS, GOALS, HEALTH, SLOTS } from "../app/lib/profile";
 import { money, type Meal } from "../app/types";
 import { Counter, Sheet } from "./ui";
 
@@ -21,6 +21,12 @@ export function PlannerSheet(p: {
   setMealSlots: (f: (v: string[]) => string[]) => void;
   cuisines: string[];
   setCuisines: (f: (v: string[]) => string[]) => void;
+  diet: string[];
+  setDiet: (f: (v: string[]) => string[]) => void;
+  health: string[];
+  setHealth: (f: (v: string[]) => string[]) => void;
+  notes: string;
+  setNotes: (s: string) => void;
   close: () => void;
   run: () => void;
 }) {
@@ -30,8 +36,30 @@ export function PlannerSheet(p: {
 
   return (
     <Sheet close={p.close} label="Planifier mes repas" tall>
-      <h2 className="sheet-title">Planifier mes repas</h2>
-      <p className="sheet-text">Eazy propose un plat pour chaque repas choisi, chaque jour, à partir d'aujourd'hui.</p>
+      <h2 className="sheet-title">Mon plan sur mesure</h2>
+      <p className="sheet-text">Eazy compose chaque plat selon ta santé, ton régime et ton budget, et t'explique pourquoi il te convient.</p>
+
+      <h3 className="sheet-label">Ta santé et ta digestion</h3>
+      <div className="chips">
+        {HEALTH.map((x) => (
+          <button key={x} className={`chip ${p.health.includes(x) ? "on" : ""}`} onClick={() => toggle(p.setHealth, x)} aria-pressed={p.health.includes(x)}>
+            {p.health.includes(x) ? <Check /> : <Plus />} {x}
+          </button>
+        ))}
+      </div>
+
+      <h3 className="sheet-label">Ton régime</h3>
+      <div className="chips">
+        {DIETS.map((x) => (
+          <button key={x} className={`chip ${p.diet.includes(x) ? "on" : ""}`} onClick={() => toggle(p.setDiet, x)} aria-pressed={p.diet.includes(x)}>
+            {p.diet.includes(x) ? <Check /> : <Plus />} {x}
+          </button>
+        ))}
+      </div>
+      <label className="field">
+        <span>Allergies ou aliments à éviter</span>
+        <input value={p.notes} onChange={(e) => p.setNotes(e.target.value)} placeholder="Arachide, crevettes, aubergine…" />
+      </label>
 
       <div className="counters">
         <Counter label="Jours" value={p.days} set={p.setDays} min={1} max={14} />
@@ -74,7 +102,7 @@ export function PlannerSheet(p: {
       </div>
 
       <button className="btn btn-green sheet-go" onClick={p.run} disabled={!p.mealSlots.length || !p.cuisines.length}>
-        <Sparkles /> Composer {n} repas
+        <Sparkles /> Composer mes {n} repas
       </button>
     </Sheet>
   );

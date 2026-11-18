@@ -46,7 +46,7 @@ export function Sheet({
 export function Busy({ label }: { label: string }) {
   const l = label.toLowerCase();
   const sub = l.includes("plan")
-    ? "Il compare les prix du marché pour tenir ton budget."
+    ? "Il choisit des plats adaptés à ta santé et à ton régime, au prix du marché."
     : l.includes("vidéo")
       ? "Il note chaque ingrédient et chaque geste."
       : l.includes("étapes")

@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowRight, Check, ChefHat, Clock3, PackageOpen, Play, RefreshCw, ShoppingBasket, Trash2, Users } from "lucide-react";
+import { ArrowRight, Check, ChefHat, Clock3, HeartPulse, PackageOpen, Play, RefreshCw, ShoppingBasket, SlidersHorizontal, Sparkles, Trash2, Users } from "lucide-react";
+import type { Profile } from "../app/lib/profile";
 import { recipes, type Recipe } from "../app/data";
 import { img } from "../app/lib/images";
 import { money, type Cart, type Meal, type Pantry, type PlanResult } from "../app/types";
@@ -32,8 +33,32 @@ function mealWhen(m: Meal) {
 }
 
 /* ---------------------------- Aujourd'hui ---------------------------- */
+export function ProfileTags({ profile, onEdit, compact = false }: { profile: Profile; onEdit: () => void; compact?: boolean }) {
+  const tags = [
+    `${profile.people} pers.`,
+    `${money(profile.weeklyBudget)} / semaine`,
+    ...profile.health,
+    ...profile.diet,
+    ...(profile.notes ? [`Sans ${profile.notes}`] : []),
+  ];
+  return (
+    <div className={`profile-tags ${compact ? "compact" : ""}`}>
+      <div className="tags">
+        {tags.map((t) => (
+          <span key={t} className={profile.health.includes(t) ? "tag-health" : profile.diet.includes(t) ? "tag-diet" : ""}>
+            {t}
+          </span>
+        ))}
+      </div>
+      <button className="text-btn" onClick={onEdit}>
+        <SlidersHorizontal /> Modifier
+      </button>
+    </div>
+  );
+}
+
 export function TodayView({
-  people,
+  profile,
   plan,
   pantry,
   video,
@@ -46,7 +71,7 @@ export function TodayView({
   cookMeal,
   goTab,
 }: {
-  people: number;
+  profile: Profile;
   plan: PlanResult | null;
   pantry: Pantry[];
   video: any;
@@ -63,19 +88,20 @@ export function TodayView({
   const budget = plan?.summary?.budget;
   const total = plan?.summary?.estimated_total;
   const pct = budget && total ? Math.min(100, Math.round((total / budget) * 100)) : 0;
+  const personal = profile.health.length + profile.diet.length > 0 || !!profile.notes;
 
   return (
     <>
       <header className="topbar">
         <Wordmark />
-        <button className="foyer-chip" onClick={editFoyer} aria-label="Modifier mon foyer">
-          <Users /> {people} pers.
+        <button className="foyer-chip" onClick={editFoyer} aria-label="Modifier mon profil repas">
+          <Users /> {profile.people} pers.
         </button>
       </header>
 
       <div className="hello">
         <p>{greeting()}</p>
-        <h1>{next ? "Voilà ce qu'on mange." : "On planifie la semaine ?"}</h1>
+        <h1>{next ? "Voilà ce qu'on mange." : "Ta semaine de repas, faite pour toi."}</h1>
       </div>
 
       {next ? (
@@ -86,6 +112,11 @@ export function TodayView({
           <div className="next-body">
             <span className="when">{mealWhen(next)}</span>
             <h2>{next.title}</h2>
+            {next.reason && (
+              <p className="why">
+                <HeartPulse /> {next.reason}
+              </p>
+            )}
             <div className="next-actions">
               <button className="btn btn-green" onClick={() => cookMeal(next)}>
                 <Play /> Cuisiner
@@ -97,45 +128,71 @@ export function TodayView({
           </div>
         </article>
       ) : (
-        <button className="plan-hero" onClick={openPlanner}>
+        <section className="plan-hero">
           <img src={img("plan-week", 828)} alt="" />
           <div>
-            <h2>Ta semaine de repas, prête en une minute.</h2>
-            <p>Avec ton budget, ce que tu as déjà et les prix du marché.</p>
-            <span className="btn btn-green">Planifier mes repas</span>
+            <h2>{personal ? "Des repas qui respectent ton corps et ton budget." : "Dis à Eazy ce qui compte pour toi."}</h2>
+            <p>
+              {personal
+                ? "Eazy compose chaque plat en tenant compte de ton profil, et t'explique pourquoi il te convient."
+                : "Digestion, diabète, tension, régime halal ou sans lactose : ajoute-les à ton profil et chaque plat sera adapté."}
+            </p>
+            <ProfileTags profile={profile} onEdit={editFoyer} compact />
+            <button className="btn btn-green" onClick={personal ? openPlanner : editFoyer}>
+              <Sparkles /> {personal ? "Composer mon plan de repas" : "Compléter mon profil repas"}
+            </button>
+            {!personal && (
+              <button className="text-btn center" onClick={openPlanner}>
+                Composer un plan sans contrainte
+              </button>
+            )}
           </div>
-        </button>
+        </section>
       )}
 
-      {plan && budget > 0 && (
-        <button className="gauge" onClick={() => goTab("plan")}>
-          <div className="gauge-head">
-            <span>Ton plan en cours</span>
-            <b>
-              {money(total)} sur {money(budget)}
-            </b>
+      {plan && (
+        <section className="profile-card">
+          <div className="profile-card-head">
+            <b>Ton plan sur mesure</b>
+            <button className="text-btn" onClick={openPlanner}>
+              <RefreshCw /> Nouveau plan
+            </button>
           </div>
-          <div className="gauge-bar" aria-hidden>
-            <i style={{ width: pct + "%" }} className={pct > 100 ? "over" : ""} />
-          </div>
-          {plan.summary?.saved_by_pantry > 0 && (
-            <small>{money(plan.summary.saved_by_pantry)} économisés grâce à ce que tu as déjà.</small>
+          <ProfileTags profile={profile} onEdit={editFoyer} />
+          {budget > 0 && (
+            <button className="gauge" onClick={() => goTab("plan")}>
+              <div className="gauge-head">
+                <span>Courses du plan</span>
+                <b>
+                  {money(total)} sur {money(budget)}
+                </b>
+              </div>
+              <div className="gauge-bar" aria-hidden>
+                <i style={{ width: pct + "%" }} className={pct > 100 ? "over" : ""} />
+              </div>
+              {plan.summary?.saved_by_pantry > 0 && (
+                <small>{money(plan.summary.saved_by_pantry)} économisés grâce à ce que tu as déjà.</small>
+              )}
+            </button>
           )}
-        </button>
+        </section>
       )}
 
-      <div className="actions3">
+      <h3 className="h-section">Pour aller plus vite</h3>
+      <div className="actions2">
         <button onClick={scan}>
           <img src={img("feat-scan", 256)} alt="" />
-          <b>Scanner mon frigo</b>
+          <span>
+            <b>Scanner mon frigo</b>
+            <small>Eazy cuisine d'abord ce que tu as.</small>
+          </span>
         </button>
         <button onClick={openVideo}>
           <img src={img("feat-video", 256)} alt="" />
-          <b>Recette d'une vidéo</b>
-        </button>
-        <button onClick={openPlanner}>
-          <img src={img("feat-plan", 256)} alt="" />
-          <b>{plan ? "Nouveau plan" : "Planifier"}</b>
+          <span>
+            <b>Recette d'une vidéo</b>
+            <small>TikTok, Instagram ou YouTube.</small>
+          </span>
         </button>
       </div>
 
@@ -158,7 +215,7 @@ export function TodayView({
         </button>
       )}
 
-      <h3 className="h-section">À cuisiner bientôt</h3>
+      <h3 className="h-section">Idées de plats</h3>
       <div className="recipe-rail">
         {recipes.map((r) => (
           <button key={r.id} className="recipe" onClick={() => openRecipe(r)}>
@@ -179,6 +236,8 @@ export function TodayView({
 
 /* ---------------------------- Mes repas ---------------------------- */
 export function PlanView({
+  profile,
+  editFoyer,
   plan,
   regenerate,
   openMeal,
@@ -187,6 +246,8 @@ export function PlanView({
   addAll,
   deliver,
 }: {
+  profile: Profile;
+  editFoyer: () => void;
   plan: PlanResult | null;
   regenerate: () => void;
   openMeal: (m: Meal) => void;
@@ -213,7 +274,7 @@ export function PlanView({
       <Empty
         image="feat-plan"
         title="Pas encore de plan."
-        text="Dis à Eazy combien de jours tu veux prévoir : il compose les repas et la liste de courses qui va avec."
+        text="Eazy compose tes repas selon ton budget, ton régime et ta santé, puis la liste de courses qui va avec."
         action="Planifier mes repas"
         go={regenerate}
       />
@@ -224,11 +285,12 @@ export function PlanView({
   return (
     <>
       <div className="hello compact">
-        <h1>Tes repas</h1>
+        <h1>Ton plan sur mesure</h1>
         <p className="lead">
           {plan.meals.length} plats pour {groups.length} jour{groups.length > 1 ? "s" : ""}, estimés à {money(plan.summary?.estimated_total)}.
         </p>
       </div>
+      <ProfileTags profile={profile} onEdit={editFoyer} />
 
       <div className="days" role="tablist" aria-label="Jours du plan">
         {groups.map(([k, ms], i) => {
@@ -258,7 +320,11 @@ export function PlanView({
             <div className="meal-body">
               <span className="slot">{m.meal}</span>
               <h3 onClick={() => openMeal(m)}>{m.title}</h3>
-              {m.reason && <p>{m.reason}</p>}
+              {m.reason && (
+                <p className="why small">
+                  <HeartPulse /> {m.reason}
+                </p>
+              )}
               <div className="meal-actions">
                 <button onClick={() => prepareMeal(m)}>
                   <Play /> Cuisiner

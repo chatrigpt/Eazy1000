@@ -3,25 +3,25 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { img } from "../app/lib/images";
-import { CUISINES, GOALS, SLOTS, type Profile } from "../app/lib/profile";
+import { CUISINES, DIETS, GOALS, HEALTH, SLOTS, type Profile } from "../app/lib/profile";
 import { money } from "../app/types";
 import { Counter, Wordmark } from "./ui";
 
 const SLIDES = [
   {
-    img: "ob-market",
-    title: "Bien manger, sans se ruiner.",
-    text: "Eazy compose tes repas de la semaine avec les vrais prix des marchés et supermarchés d'Abidjan, pour rester dans ton budget.",
+    img: "plan-week",
+    title: "Des repas faits pour ton corps et ton budget.",
+    text: "Digestion difficile, diabète, tension, régime halal ou sans lactose : Eazy compose ta semaine de repas en respectant tout ça, avec les vrais prix des marchés d'Abidjan.",
   },
   {
-    img: "ob-scan",
-    title: "Photographie ton frigo, Eazy cuisine avec.",
-    text: "Il reconnaît ce que tu as déjà et te propose des plats qui l'utilisent. Moins de gaspillage, moins de dépenses.",
+    img: "ob-market",
+    title: "Chaque plat, expliqué.",
+    text: "Pour chaque repas, Eazy te dit pourquoi il te convient : moins de piment pour ton estomac, moins de sel pour ta tension, assez de protéines pour tenir la journée.",
   },
   {
     img: "ob-delivery",
-    title: "Tes courses, au franc près.",
-    text: "Une liste claire comme un ticket de caisse, à cocher au marché, ou à faire livrer chez toi en un geste.",
+    title: "Puis les courses suivent, au franc près.",
+    text: "Ton plan devient un ticket de courses à cocher au marché ou à faire livrer. Tu peux aussi scanner ton frigo pour cuisiner ce que tu as déjà.",
   },
 ];
 
@@ -53,14 +53,14 @@ export function Onboarding({ done }: { done: () => void }) {
           ))}
         </div>
         <button className="btn btn-green" onClick={() => (last ? done() : setI(i + 1))}>
-          {last ? "Configurer mon foyer" : "Suivant"}
+          {last ? "Créer mon profil repas" : "Suivant"}
         </button>
       </footer>
     </main>
   );
 }
 
-const STEPS = ["people", "budget", "goal", "cuisines", "slots"] as const;
+const STEPS = ["people", "health", "diet", "budget", "goal", "cuisines", "slots"] as const;
 
 export function FoyerSetup({
   initial,
@@ -75,7 +75,7 @@ export function FoyerSetup({
   const [step, setStep] = useState(0);
   const cur = STEPS[step];
   const set = (x: Partial<Profile>) => setP((v) => ({ ...v, ...x }));
-  const toggle = (key: "cuisines" | "mealSlots", v: string) =>
+  const toggle = (key: "cuisines" | "mealSlots" | "diet" | "health", v: string) =>
     set({ [key]: p[key].includes(v) ? p[key].filter((y) => y !== v) : [...p[key], v] } as Partial<Profile>);
   const ok =
     (cur === "cuisines" && p.cuisines.length > 0) ||
@@ -130,6 +130,44 @@ export function FoyerSetup({
                 Environ {money(p.weeklyBudget / 7 / p.people)} par personne et par jour.
               </p>
             </div>
+          </>
+        )}
+        {cur === "diet" && (
+          <>
+            <h1>Ton régime alimentaire ?</h1>
+            <p className="sub">Eazy le respecte strictement dans chaque plat. Laisse vide si tu manges de tout.</p>
+            <div className="chips big">
+              {DIETS.map((d) => (
+                <button key={d} className={`chip ${p.diet.includes(d) ? "on" : ""}`} onClick={() => toggle("diet", d)} aria-pressed={p.diet.includes(d)}>
+                  {p.diet.includes(d) && <Check />} {d}
+                </button>
+              ))}
+            </div>
+            <label className="field">
+              <span>Allergies ou aliments à éviter</span>
+              <input
+                value={p.notes}
+                onChange={(e) => set({ notes: e.target.value })}
+                placeholder="Arachide, crevettes, aubergine…"
+              />
+            </label>
+          </>
+        )}
+        {cur === "health" && (
+          <>
+            <h1>Ta digestion et ta santé ?</h1>
+            <p className="sub">
+              Eazy adapte les ingrédients, les cuissons et les épices, et t'explique pourquoi chaque plat te convient.
+              Ces conseils ne remplacent pas l'avis d'un médecin.
+            </p>
+            <div className="chips big">
+              {HEALTH.map((h) => (
+                <button key={h} className={`chip ${p.health.includes(h) ? "on" : ""}`} onClick={() => toggle("health", h)} aria-pressed={p.health.includes(h)}>
+                  {p.health.includes(h) && <Check />} {h}
+                </button>
+              ))}
+            </div>
+            <p className="hint">Rien de particulier ? Continue simplement.</p>
           </>
         )}
         {cur === "goal" && (
@@ -188,7 +226,7 @@ export function FoyerSetup({
           disabled={!ok}
           onClick={() => (step < STEPS.length - 1 ? setStep(step + 1) : save({ ...p, onboarded: true }))}
         >
-          {step < STEPS.length - 1 ? "Continuer" : "C'est mon foyer"}
+          {step < STEPS.length - 1 ? "Continuer" : "Voir mon accueil"}
         </button>
       </footer>
     </main>
