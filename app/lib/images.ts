@@ -1,27 +1,23 @@
-// Illustrations générées (GPT Image 2 via POYO), palette « Marché d'Adjamé », optimisées par Vercel.
+// Illustrations Eazy 1000 — générées avec POYO (GPT Image 2), palette « Marché d'Adjamé »,
+// hébergées sur Google Drive (dossier « Eazy1000 – illustrations », partagé par lien).
+// lh3.googleusercontent.com sert l'image et la redimensionne avec le suffixe =wN.
 const IDS: Record<string, string> = {
-  "gombo-wave": "FG2YQ7QORRVLGHAS",
-  "gombo-head": "6WSM76S7VRZP68QD",
-  "gombo-cheers": "K0JT6U9TA9I6HKLK",
-  "gombo-think": "MV5AHRQT0SFU7SDN",
-  "ob-market": "3HJAPMKYS22KJLP2",
-  "ob-scan": "PQIMYMVQKI8ZUSX5",
-  "ob-delivery": "XG2LAYWLRA5IYDDF",
-  "plan-week": "SR5GRLF8ZX66B6QG",
-  "feat-scan": "JOGQK7G4ZENYN015",
-  "feat-video": "AWOAT76Y9YBESG2M",
-  "feat-plan": "H818ZB37RRVWWS13",
-  "empty-cart": "TAFF7AKTFEKLM0UH",
-  "empty-pantry": "J3IL290U80VO1QZS",
-  "cook-done": "XV70AA6Y6E3FSM7Y",
+  "plan-week": "13DuKOd1lXxvVRomcy9hTN8oohHZkXzdH",
+  "ob-market": "13hThNB4CpDqKLKEn7JawEmTNtdSe9FDp",
+  "ob-delivery": "1wJwY4rniSN0430QchCUc1BeGgBgu5Nro",
+  "feat-scan": "1w9RjP96e-Hem-0vMKNOyxywP0FJO9G4W",
+  "feat-video": "1s7HCdtwn2y_PN7jzaWjHKXbsxrMxv1qJ",
+  "feat-plan": "14XuPDEi3U0BLPz2KSMSjU2TD0FkKqFhQ",
+  "empty-cart": "1MkEMsrnXq_jegeriQuoqtXMEi1jyABfh",
+  "empty-pantry": "1taBrioUwXwQ7R2CwykFd7EV5otWBikJ_",
+  "cook-done": "1-OPc2wHs2e1kWLQh0O6YmFEvOCIM-nfF",
+  "gombo-cheers": "1xSFLQyzx3XmLhOomL21bPJenJhxoBwR3",
+  "gombo-think": "1HCo6Z__1WrQx7ZSH2hDJRhJLVqddV3Vm",
 };
-
-const ALLOWED_W = [256, 384, 640, 750, 828, 1080];
 
 export function img(name: string, width = 750): string {
   const id = IDS[name];
   if (!id) return "";
-  const src = `https://cdn.doculator.org/images/${id}/${id}.png`;
-  const w = ALLOWED_W.find((x) => x >= width) ?? 1080;
-  return `/_next/image?url=${encodeURIComponent(src)}&w=${w}&q=75`;
+  const w = Math.min(1400, Math.round(width * 1.5));
+  return `https://lh3.googleusercontent.com/d/${id}=w${w}`;
 }
